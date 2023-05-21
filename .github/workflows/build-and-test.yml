@@ -3,17 +3,20 @@ name: Build and Test
 on: 
   push:
     branches: [ main ]
+  pull_request:
+    types: [ opened, synchronize, closed ]
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: .
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout source code
+        uses: actions/checkout@v2
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
@@ -22,6 +25,7 @@ jobs:
 
       - name: Restore dependencies
         run: |
+          ls
           dotnet restore
           dotnet tool restore
 
