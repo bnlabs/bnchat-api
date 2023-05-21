@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./toff-api
+        working-directory: .
 
     steps:
       - name: Checkout source code
@@ -25,6 +25,7 @@ jobs:
 
       - name: Restore dependencies
         run: |
+          ls
           dotnet restore
           dotnet tool restore
 
