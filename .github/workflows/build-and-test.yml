@@ -3,16 +3,19 @@ name: Build and Test
 on: 
   push:
     branches: [ main ]
+  pull_request:
+    types: [opened, synchronize, closed]
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: .
 
     steps:
+      - name: Checkout source code
       - uses: actions/checkout@v2
 
       - name: Set up .NET Core
