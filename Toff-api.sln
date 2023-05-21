@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToffTests", "tofftests\ToffTests.csproj", "{3EEE2B15-6EFC-48ED-8F06-B272D59640BB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ToffTests", ".\tofftests\ToffTests.csproj", "{3EEE2B15-6EFC-48ED-8F06-B272D59640BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toffapi", "toffapi\Toffapi.csproj", "{7B2E3FD3-7900-466F-9223-5BA833EA0C43}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Toffapi", ".\toffapi\Toffapi.csproj", "{7B2E3FD3-7900-466F-9223-5BA833EA0C43}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
