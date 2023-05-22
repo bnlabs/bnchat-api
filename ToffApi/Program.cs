@@ -5,6 +5,7 @@ using ToffApi.AuthenticationService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using System.IdentityModel.Tokens.Jwt;
 
 var builder = WebApplication.CreateBuilder(args);
 var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbConfig)).Get<MongoDbConfig>();
@@ -20,6 +21,7 @@ builder.Services
     .AddMongoDbStores<User, ApplicationRole, Guid>(mongoDbSettings.ConnectionString, mongoDbSettings.Name);
 builder.Services.AddSingleton<IAccessTokenManager, AccessTokenManager>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSingleton<JwtSecurityTokenHandler>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddAuthentication(options =>
 {

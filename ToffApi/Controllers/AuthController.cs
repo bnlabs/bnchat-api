@@ -7,6 +7,9 @@ using ToffApi.AuthenticationService;
 using Microsoft.AspNetCore.Authorization;
 using AspNetCore.Identity.MongoDbCore.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Http;
 
 namespace ToffApi.Controllers
 {
@@ -19,18 +22,21 @@ namespace ToffApi.Controllers
         private readonly IAccessTokenManager accessTokenManager;
         private readonly IHttpContextAccessor httpContextAccessor;
         private readonly SignInManager<User> signInManager;
+        private readonly JwtSecurityTokenHandler tokenHandler;
 
         public AuthController(UserManager<User> userManager,
             RoleManager<ApplicationRole> roleManager,
             IAccessTokenManager accessTokenManager,
             IHttpContextAccessor httpContextAccessor,
-            SignInManager<User> signInManager)
+            SignInManager<User> signInManager,
+            JwtSecurityTokenHandler tokenHandler)
         {
             this.userManager = userManager;
             this.roleManager = roleManager;
             this.accessTokenManager = accessTokenManager;
             this.httpContextAccessor = httpContextAccessor;
             this.signInManager = signInManager;
+            this.tokenHandler = tokenHandler;
         }
 
         [HttpPost("/auth/signup")]
@@ -86,6 +92,14 @@ namespace ToffApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([Required][EmailAddress] string email, [Required] string password, string returnurl)
         {
+            // example of how to retrieve user info from JWT
+            var tokenFromRequest = httpContextAccessor.HttpContext.Request.Cookies["X-Access-Token"];
+            if (!string.IsNullOrEmpty(tokenFromRequest))
+            {
+                var User_Id = tokenHandler.ReadJwtToken(tokenFromRequest).Claims.First(claim => claim.Type == "userId").Value;
+            }
+            /// END EXAMPLE
+
             if (ModelState.IsValid)
             {
                 User appUser = await userManager.FindByEmailAsync(email);
