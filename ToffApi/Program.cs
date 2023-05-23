@@ -1,4 +1,3 @@
-using IdentityMongo.Settings;
 using Microsoft.OpenApi.Models;
 using Toff.Models;
 using ToffApi.AuthenticationService;
@@ -6,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using ToffApi;
 
 var builder = WebApplication.CreateBuilder(args);
 var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbConfig)).Get<MongoDbConfig>();

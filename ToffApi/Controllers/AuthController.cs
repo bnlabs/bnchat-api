@@ -5,11 +5,8 @@ using System.ComponentModel.DataAnnotations;
 using ToffApi.DtoModels;
 using ToffApi.AuthenticationService;
 using Microsoft.AspNetCore.Authorization;
-using AspNetCore.Identity.MongoDbCore.Models;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Http;
 
 namespace ToffApi.Controllers
 {
@@ -17,12 +14,12 @@ namespace ToffApi.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly UserManager<User> userManager;
-        private readonly RoleManager<ApplicationRole> roleManager;
-        private readonly IAccessTokenManager accessTokenManager;
-        private readonly IHttpContextAccessor httpContextAccessor;
-        private readonly SignInManager<User> signInManager;
-        private readonly JwtSecurityTokenHandler tokenHandler;
+        private readonly UserManager<User> _userManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
+        private readonly IAccessTokenManager _accessTokenManager;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly SignInManager<User> _signInManager;
+        private readonly JwtSecurityTokenHandler _tokenHandler;
 
         public AuthController(UserManager<User> userManager,
             RoleManager<ApplicationRole> roleManager,
@@ -31,41 +28,37 @@ namespace ToffApi.Controllers
             SignInManager<User> signInManager,
             JwtSecurityTokenHandler tokenHandler)
         {
-            this.userManager = userManager;
-            this.roleManager = roleManager;
-            this.accessTokenManager = accessTokenManager;
-            this.httpContextAccessor = httpContextAccessor;
-            this.signInManager = signInManager;
-            this.tokenHandler = tokenHandler;
+            this._userManager = userManager;
+            this._roleManager = roleManager;
+            this._accessTokenManager = accessTokenManager;
+            this._httpContextAccessor = httpContextAccessor;
+            this._signInManager = signInManager;
+            this._tokenHandler = tokenHandler;
         }
 
         [HttpPost("/auth/signup")]
         public async Task<IActionResult> CreateUser(UserDto user)
         {
-
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return Ok();
+            var appUser = new User
             {
-                var appUser = new User
-                {
-                    UserName = user.Name,
-                    Email = user.Email
-                };
+                UserName = user.Name,
+                Email = user.Email
+            };
 
-                IdentityResult result = await userManager.CreateAsync(appUser, user.Password);
+            var result = await _userManager.CreateAsync(appUser, user.Password);
 
-                if (result.Succeeded)
-                {
-                    string message = "User Created Successfully";
-                    return Ok(message);
-                }
-                else
-                {
-                    foreach (IdentityError error in result.Errors)
-                        ModelState.AddModelError("", error.Description);
-                    return BadRequest(ModelState);
-                }
+            if (result.Succeeded)
+            {
+                const string message = "User Created Successfully";
+                return Ok(message);
             }
-            return Ok();
+            else
+            {
+                foreach (IdentityError error in result.Errors)
+                    ModelState.AddModelError("", error.Description);
+                return BadRequest(ModelState);
+            }
         }
 
         //[HttpPost("/auth/role")]
@@ -93,27 +86,31 @@ namespace ToffApi.Controllers
         public async Task<IActionResult> Login([Required][EmailAddress] string email, [Required] string password, string returnurl)
         {
             // example of how to retrieve user info from JWT
-            var tokenFromRequest = httpContextAccessor.HttpContext.Request.Cookies["X-Access-Token"];
-            if (!string.IsNullOrEmpty(tokenFromRequest))
+            if (_httpContextAccessor.HttpContext != null)
             {
-                var User_Id = tokenHandler.ReadJwtToken(tokenFromRequest).Claims.First(claim => claim.Type == "userId").Value;
+                var tokenFromRequest = _httpContextAccessor.HttpContext.Request.Cookies["X-Access-Token"];
+                if (!string.IsNullOrEmpty(tokenFromRequest))
+                {
+                    var userId = _tokenHandler.ReadJwtToken(tokenFromRequest).Claims.First(claim => claim.Type == "userId").Value;
+                }
             }
-            /// END EXAMPLE
+
+            // END EXAMPLE
 
             if (ModelState.IsValid)
             {
-                User appUser = await userManager.FindByEmailAsync(email);
+                var appUser = await _userManager.FindByEmailAsync(email);
                 if (appUser != null)
                 {
-                    Microsoft.AspNetCore.Identity.SignInResult result = await signInManager.PasswordSignInAsync(appUser, password, false, false);
+                    Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(appUser, password, false, false);
                     if (result.Succeeded)
                     {
-                        var token = accessTokenManager.GenerateToken(appUser, new List<string>());
+                        var token = _accessTokenManager.GenerateToken(appUser, new List<string>());
                         Response.Cookies.Append("X-Access-Token", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict });
                         return Ok(new { Result = result,
                                     username = appUser.UserName,
                                     email = appUser.Email,
-                                    token = accessTokenManager.GenerateToken(appUser, new List<string>())
+                                    token = _accessTokenManager.GenerateToken(appUser, new List<string>())
                                 });
                     }
                 }
@@ -127,7 +124,7 @@ namespace ToffApi.Controllers
         [HttpPut("/auth/logout")]
         public async Task<IActionResult> Logout()
         {
-            await signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();
 
             return Ok();
         }

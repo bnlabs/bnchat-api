@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace IdentityMongo.Settings
+﻿namespace ToffApi
 {
     public class MongoDbConfig
     {
