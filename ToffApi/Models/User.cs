@@ -1,6 +1,8 @@
-namespace Models;
+using AspNetCore.Identity.MongoDbCore.Models;
 
-public class User
+namespace Toff.Models;
+
+public class User : MongoIdentityUser<Guid>
 {
     public User()
     {
