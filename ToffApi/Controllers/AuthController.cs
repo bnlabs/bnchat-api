@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations;
 using ToffApi.DtoModels;
 using ToffApi.AuthenticationService;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace ToffApi.Controllers
@@ -53,12 +52,10 @@ namespace ToffApi.Controllers
                 const string message = "User Created Successfully";
                 return Ok(message);
             }
-            else
-            {
-                foreach (IdentityError error in result.Errors)
+            foreach (var error in result.Errors)
                     ModelState.AddModelError("", error.Description);
-                return BadRequest(ModelState);
-            }
+            return BadRequest(ModelState);
+            
         }
 
         //[HttpPost("/auth/role")]
@@ -102,7 +99,7 @@ namespace ToffApi.Controllers
                 var appUser = await _userManager.FindByEmailAsync(email);
                 if (appUser != null)
                 {
-                    Microsoft.AspNetCore.Identity.SignInResult result = await _signInManager.PasswordSignInAsync(appUser, password, false, false);
+                    var result = await _signInManager.PasswordSignInAsync(appUser, password, false, false);
                     if (result.Succeeded)
                     {
                         var token = _accessTokenManager.GenerateToken(appUser, new List<string>());
@@ -116,7 +113,7 @@ namespace ToffApi.Controllers
                 }
                 ModelState.AddModelError(nameof(email), "Login Failed: Invalid Email or Password");
             }
-            IEnumerable<ModelError> allErrors = ModelState.Values.SelectMany(v => v.Errors);
+            var allErrors = ModelState.Values.SelectMany(v => v.Errors);
             return BadRequest(allErrors);
         }
 
