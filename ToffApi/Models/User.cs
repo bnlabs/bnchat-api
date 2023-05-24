@@ -1,6 +1,6 @@
 using AspNetCore.Identity.MongoDbCore.Models;
 
-namespace Toff.Models;
+namespace ToffApi.Models;
 
 public class User : MongoIdentityUser<Guid>
 {

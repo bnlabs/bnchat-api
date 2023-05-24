@@ -4,21 +4,21 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Primitives;
-using Toff.Models;
+using ToffApi.Models;
 
 
 namespace ToffApi.AuthenticationService
 {
     public class AccessTokenManager : IAccessTokenManager
     {
-        private readonly IDistributedCache accessTokensCache;
-        private readonly IHttpContextAccessor httpContextAccessor;
+        private readonly IDistributedCache _accessTokensCache;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IConfiguration _config;
         public AccessTokenManager(IConfiguration config, IDistributedCache distributedCache, IHttpContextAccessor httpContextAccessor)
         {
             _config = config;
-            accessTokensCache = distributedCache;
-            this.httpContextAccessor = httpContextAccessor;
+            _accessTokensCache = distributedCache;
+            this._httpContextAccessor = httpContextAccessor;
         }
         public string GenerateToken(User user, IList<string> roles)
         {
@@ -46,14 +46,14 @@ namespace ToffApi.AuthenticationService
 
         public async Task<bool> IsActiveAsync(string token)
         {
-            return await accessTokensCache.GetStringAsync(GetKey(token)) == null;
+            return await _accessTokensCache.GetStringAsync(GetKey(token)) == null;
         }
 
         public async Task<bool> IsCurrentActiveToken() => await IsActiveAsync(GetCurrentAsync());
 
         private string GetCurrentAsync()
         {
-            var authorizationHeader = httpContextAccessor.HttpContext.Request.Headers["authorization"];
+            var authorizationHeader = _httpContextAccessor.HttpContext.Request.Headers["authorization"];
 
             return authorizationHeader == StringValues.Empty ? string.Empty : authorizationHeader.Single().Split(" ").Last();
         }

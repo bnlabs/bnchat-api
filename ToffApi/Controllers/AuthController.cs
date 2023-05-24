@@ -1,11 +1,11 @@
-﻿using Toff.Models;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using ToffApi.DtoModels;
 using ToffApi.AuthenticationService;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
+using ToffApi.Models;
 
 namespace ToffApi.Controllers
 {
