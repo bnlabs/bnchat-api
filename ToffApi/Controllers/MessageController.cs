@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ToffApi.DataAccess;
 using ToffApi.DtoModels;
@@ -24,26 +19,41 @@ namespace ToffApi.Controllers
         }
         
         [HttpGet("getConversation")]
-        public async Task<IActionResult> GetConversation(Guid userId, Guid conversationId)
+        public async Task<IActionResult> GetConversationByUserId(Guid userId)
         {
-            var result = await _messageDataAccess.GetMessagesFromConversation(userId, conversationId);
-            return Ok(result);
+            var conversations = await _messageDataAccess.GetConversationByUserId(userId);
+            foreach (var c in conversations)
+            {
+                c.Messages = await _messageDataAccess.GetMessagesFromConversation(userId, c.ConversationId);
+            }
+
+            return Ok(conversations);
         }
         
-        [HttpPost("add")]
-        public async Task<IActionResult> AddMessage(MessageDto msg)
+        // This should be a signalR hub command
+        // [HttpPost("addMessage")]
+        // public async Task<IActionResult> AddMessage(MessageDto msg)
+        // {
+        //     var messageMapped = new Message
+        //     {
+        //         SenderName = msg.SenderName,
+        //         SenderId = msg.SenderId,
+        //         Content = msg.Content,
+        //         ConversationId = msg.ConversationId,
+        //         TimeStamp = DateTime.Now
+        //     };
+        //     
+        //     await _messageDataAccess.AddMessage(messageMapped);
+        //     return Ok();
+        // }
+        
+        [HttpPost("createConversation")]
+        public async Task<IActionResult> CreateConversation(ConversationDto conversationDto)
         {
-            var messageMapped = new Message
-            {
-                SenderId = msg.SenderId,
-                Content = msg.Content,
-                ConversationId = msg.ConversationId,
-                TimeStamp = DateTime.Now
-            };
-            
-            await _messageDataAccess.AddMessage(messageMapped);
+            var c = new Conversation(conversationDto.MemberIds);
+            await _messageDataAccess.AddConversation(c);
             return Ok();
         }
-        
+
     }
 }

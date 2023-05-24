@@ -1,11 +1,15 @@
 using Microsoft.OpenApi.Models;
-using Toff.Models;
 using ToffApi.AuthenticationService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Cors;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using Microsoft.AspNetCore.Cors.Infrastructure;
 using ToffApi;
+using ToffApi.Models;
+using ToffApi.DataAccess;
+using ToffApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbConfig)).Get<MongoDbConfig>();
@@ -21,8 +25,11 @@ builder.Services
     .AddMongoDbStores<User, ApplicationRole, Guid>(mongoDbSettings.ConnectionString, mongoDbSettings.Name);
 builder.Services.AddSingleton<IAccessTokenManager, AccessTokenManager>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSingleton<IMessageDataAccess, MessageDataAccess>(provider => new MessageDataAccess(mongoDbSettings.ConnectionString,
+    "Identity"));
 builder.Services.AddSingleton<JwtSecurityTokenHandler>();
 builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSignalR();
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -85,10 +92,24 @@ builder.Services.AddSwaggerGen(setup => {
     });
 });
 builder.Services.AddAuthorization();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllHeaders",
+        b =>
+        {
+            b.WithOrigins("http://127.0.0.1:5173")
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .AllowCredentials();
+        });
+});
 
 
 
 var app = builder.Build();
+
+app.UseRouting();
+app.UseCors("AllowAllHeaders");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -98,11 +119,12 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthentication();
 
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.MapHub<MessageHub>("/message-hub");
 
 app.Run();

@@ -5,10 +5,12 @@ namespace ToffApi.DtoModels;
 public class MessageDto
 {
     public Guid Id { get; set; }
-
-    [Required]
-    public Guid ReceiverId { get; set; }
     
+    [Required] 
+    public Guid ConversationId { get; set; }
+    [Required] 
+    public string SenderName { get; set; }
+
     [Required]
     public Guid SenderId { get; set; }
 
