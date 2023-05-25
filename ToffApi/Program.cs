@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Cors;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
+using AutoMapper;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using ToffApi;
 using ToffApi.Models;
@@ -27,6 +28,7 @@ builder.Services.AddSingleton<IAccessTokenManager, AccessTokenManager>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<IMessageDataAccess, MessageDataAccess>(provider => new MessageDataAccess(mongoDbSettings.ConnectionString,
     "Identity"));
+// builder.Services.AddSingleton<IMapper,Mapper>();
 builder.Services.AddSingleton<JwtSecurityTokenHandler>();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSignalR();

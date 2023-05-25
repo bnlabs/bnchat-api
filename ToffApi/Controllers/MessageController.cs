@@ -30,7 +30,7 @@ namespace ToffApi.Controllers
             return Ok(conversations);
         }
         
-        // This should be a signalR hub command
+        // This should be a signalR hub method
         // [HttpPost("addMessage")]
         // public async Task<IActionResult> AddMessage(MessageDto msg)
         // {
