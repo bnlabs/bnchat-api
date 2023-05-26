@@ -10,10 +10,17 @@ using Microsoft.AspNetCore.Cors.Infrastructure;
 using ToffApi;
 using ToffApi.Models;
 using ToffApi.DataAccess;
+using ToffApi.DtoModels;
 using ToffApi.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbConfig)).Get<MongoDbConfig>();
+var configuration = new MapperConfiguration(cfg => 
+{
+    cfg.CreateMap<MessageDto, Message>();
+    cfg.CreateMap<UserDto, User>();
+});
+var mapper = new Mapper(configuration);
 
 // Add services to the container.
 
@@ -28,8 +35,10 @@ builder.Services.AddSingleton<IAccessTokenManager, AccessTokenManager>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<IMessageDataAccess, MessageDataAccess>(provider => new MessageDataAccess(mongoDbSettings.ConnectionString,
     "Identity"));
-// builder.Services.AddSingleton<IMapper,Mapper>();
+builder.Services.AddSingleton<IUserDataAccess, UserDataAccess>(provider => new UserDataAccess(mongoDbSettings.ConnectionString,
+    "Identity"));
 builder.Services.AddSingleton<JwtSecurityTokenHandler>();
+builder.Services.AddSingleton<IMapper, Mapper>(_ => mapper);
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSignalR();
 builder.Services.AddAuthentication(options =>

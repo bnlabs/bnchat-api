@@ -10,29 +10,32 @@ namespace ToffApi.Hubs;
 public class MessageHub : Hub
 {
     private readonly IMessageDataAccess _messageDataAccess;
-    // private readonly IMapper _mapper;
+    private readonly IMapper _mapper;
+    private readonly IUserDataAccess _userDataAccess;
 
-    public MessageHub(IMessageDataAccess messageDataAccess)
+    public MessageHub(IMessageDataAccess messageDataAccess, IMapper mapper, IUserDataAccess userDataAccess)
     {
         _messageDataAccess = messageDataAccess;
-        // _mapper = mapper;
+        _mapper = mapper;
+        _userDataAccess = userDataAccess;
     }
 
     public async Task SendMessage(MessageDto msg)
     {
         var groupName = $"conversation-{msg.ConversationId}";
-        // var mappedMessage = _mapper.Map<Message>(msg);
-        
-        // await _messageDataAccess.AddMessage(mappedMessage);
+        var mappedMessage = _mapper.Map<Message>(msg);
+
+        await _messageDataAccess.AddMessage(mappedMessage);
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-        await Clients.Group(groupName).SendAsync("ReceiveMessage", msg);
+        await Clients.Group(groupName).SendAsync("ReceiveMessage", new { message = mappedMessage, id = Context.ConnectionId });
         // await Clients.All.SendAsync("messageReceive", msg);
     }
 
-    public Task AddToGroup(Guid conversationId)
+    public async Task JoinGroup(Guid conversationId)
     {
         var groupName = $"conversation-{conversationId}";
-        return Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+        await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+        await Clients.Group(groupName).SendAsync("UserJoined", groupName);
     }
 
 }

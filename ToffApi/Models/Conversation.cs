@@ -2,6 +2,7 @@
 
 namespace ToffApi.Models;
 
+[BsonIgnoreExtraElements]
 public class Conversation
 {
     public Conversation(List<Guid> memberIds)

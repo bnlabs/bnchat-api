@@ -2,6 +2,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace ToffApi.Models;
 
+[BsonIgnoreExtraElements]
 public class Message
 {
     public Message()
