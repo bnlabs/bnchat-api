@@ -27,7 +27,7 @@ public class MessageHub : Hub
 
         await _messageDataAccess.AddMessage(mappedMessage);
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-        await Clients.Group(groupName).SendAsync("ReceiveMessage", new { message = mappedMessage, id = Context.ConnectionId });
+        await Clients.Group(groupName).SendAsync("ReceiveMessage", mappedMessage);
         // await Clients.All.SendAsync("messageReceive", msg);
     }
 
