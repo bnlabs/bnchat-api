@@ -17,5 +17,5 @@ public class MessageDto
     [Required]
     public string Content { get; set; }
 
-    public DateTime TimeStamp { get; set; }
+    public DateTime Timestamp { get; set; }
 }

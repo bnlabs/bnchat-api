@@ -35,7 +35,7 @@ public class MessageDataAccess : IMessageDataAccess
     public Task AddMessage(Message msg)
     {
         var messageCollection = ConnectToMongo<Message>(MessageCollection);
-        msg.TimeStamp = DateTime.Now;
+        msg.Timestamp = DateTime.Now;
         messageCollection.InsertOne(msg);
         return Task.CompletedTask;
     }

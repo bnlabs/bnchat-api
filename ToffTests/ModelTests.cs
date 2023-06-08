@@ -14,7 +14,7 @@ public class ModelsTests
         var senderName = message.GetType().GetProperty("SenderName");
         var senderId = message.GetType().GetProperty("SenderId");
         var content = message.GetType().GetProperty("Content");
-        var timestamp = message.GetType().GetProperty("TimeStamp");
+        var timestamp = message.GetType().GetProperty("Timestamp");
 
         Assert.NotNull(id);
         Assert.NotNull(conversationId);
@@ -22,6 +22,21 @@ public class ModelsTests
         Assert.NotNull(senderId);
         Assert.NotNull(content);
         Assert.NotNull(timestamp);
+    }
+
+    [Fact]
+    public void ConversationModelHaveProperties()
+    {
+        var memberList = new List<Guid>();
+        var conversation = new Conversation(memberList);
+
+        var id = conversation.GetType().GetProperty("ConversationId");
+        var memberIds = conversation.GetType().GetProperty("MemberIds");
+        var messages = conversation.GetType().GetProperty("Messages");
+        
+        Assert.NotNull(id);
+        Assert.NotNull(memberIds);
+        Assert.NotNull(messages);
     }
 
 

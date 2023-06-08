@@ -40,7 +40,7 @@ namespace ToffApi.Controllers
         //         SenderId = msg.SenderId,
         //         Content = msg.Content,
         //         ConversationId = msg.ConversationId,
-        //         TimeStamp = DateTime.Now
+        //         Timestamp = DateTime.Now
         //     };
         //     
         //     await _messageDataAccess.AddMessage(messageMapped);
