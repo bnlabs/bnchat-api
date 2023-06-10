@@ -1,12 +1,13 @@
-﻿using System.Text.RegularExpressions;
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using ToffApi.DataAccess;
 using ToffApi.DtoModels;
 using ToffApi.Models;
 
 namespace ToffApi.Hubs;
 
+// [Authorize]
 public class MessageHub : Hub
 {
     private readonly IMessageDataAccess _messageDataAccess;

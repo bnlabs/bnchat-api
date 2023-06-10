@@ -80,7 +80,7 @@ namespace ToffApi.Controllers
 
         [HttpPost("/auth/login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([Required][EmailAddress] string email, [Required] string password, string returnurl)
+        public async Task<IActionResult> Login([FromBody] LoginDto loginInfo)
         {
             // example of how to retrieve user info from JWT
             if (_httpContextAccessor.HttpContext != null)
@@ -96,10 +96,10 @@ namespace ToffApi.Controllers
 
             if (ModelState.IsValid)
             {
-                var appUser = await _userManager.FindByEmailAsync(email);
+                var appUser = await _userManager.FindByEmailAsync(loginInfo.Email);
                 if (appUser != null)
                 {
-                    var result = await _signInManager.PasswordSignInAsync(appUser, password, false, false);
+                    var result = await _signInManager.PasswordSignInAsync(appUser, loginInfo.Password, false, false);
                     if (result.Succeeded)
                     {
                         var token = _accessTokenManager.GenerateToken(appUser, new List<string>());
@@ -111,7 +111,7 @@ namespace ToffApi.Controllers
                                 });
                     }
                 }
-                ModelState.AddModelError(nameof(email), "Login Failed: Invalid Email or Password");
+                ModelState.AddModelError(nameof(loginInfo.Email), "Login Failed: Invalid Email or Password");
             }
             var allErrors = ModelState.Values.SelectMany(v => v.Errors);
             return BadRequest(allErrors);

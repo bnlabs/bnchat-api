@@ -1,3 +1,4 @@
+#addin nuget:?package=Cake.Git&version=3.0.0
 
 var target = Argument("target", "Test");
 var solutionFolder = "./";
