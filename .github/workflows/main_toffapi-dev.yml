@@ -32,7 +32,7 @@ jobs:
 
       - name: Run the Cake script
         run: |
-         dotnet restore
+         dotnet tool restore
          dotnet cake ../build.cake
 
       - name: dotnet publish
