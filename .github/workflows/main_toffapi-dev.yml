@@ -29,9 +29,6 @@ jobs:
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
-        
-      - name: ls
-        run: ls
 
       - name: dotnet publish
         run: dotnet publish -c Debug --property:PublishDir=${{env.DOTNET_ROOT}}/myapp
@@ -63,3 +60,10 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1F42E00472304031AE7CD91B89400550 }}
           package: .
+      
+      - name: Clean up Artifacts
+        uses: geekyeggo/delete-artifact@v2
+        with:
+            name: .net-app
+
+
