@@ -19,7 +19,7 @@ jobs:
         working-directory: ./ToffApi
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v1
@@ -27,8 +27,18 @@ jobs:
           dotnet-version: '7.x'
           include-prerelease: true
 
-      - name: Build with dotnet
-        run: dotnet build --configuration Release
+      # - name: Build with dotnet
+      #   run: dotnet build --configuration Release
+
+      - name: Run the Cake script
+        uses: cake-build/cake-action@v1
+        with:
+          cake-version: tool-manifest
+          script-path: ../build.cake
+          target: Test
+          # arguments: |
+          #   name: value
+          #   configuration: Release
 
       - name: dotnet publish
         run: dotnet publish -c Debug --property:PublishDir=${{env.DOTNET_ROOT}}/myapp
