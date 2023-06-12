@@ -2,6 +2,7 @@ using Microsoft.OpenApi.Models;
 using ToffApi.AuthenticationService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Cors;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,17 +14,22 @@ using ToffApi.DataAccess;
 using ToffApi.DtoModels;
 using ToffApi.Hubs;
 
+
 var builder = WebApplication.CreateBuilder(args);
+
+// read from appsettings.json
 var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbConfig)).Get<MongoDbConfig>();
-var configuration = new MapperConfiguration(cfg => 
+var mongoDbName = mongoDbSettings.Name;
+
+// Mapper config
+var mapperConfiguration = new MapperConfiguration(cfg => 
 {
     cfg.CreateMap<MessageDto, Message>();
     cfg.CreateMap<UserDto, User>();
 });
-var mapper = new Mapper(configuration);
+var mapper = new Mapper(mapperConfiguration);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -34,9 +40,9 @@ builder.Services
 builder.Services.AddSingleton<IAccessTokenManager, AccessTokenManager>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddSingleton<IMessageDataAccess, MessageDataAccess>(provider => new MessageDataAccess(mongoDbSettings.ConnectionString,
-    "Identity"));
+    mongoDbName));
 builder.Services.AddSingleton<IUserDataAccess, UserDataAccess>(provider => new UserDataAccess(mongoDbSettings.ConnectionString,
-    "Identity"));
+    mongoDbName));
 builder.Services.AddSingleton<JwtSecurityTokenHandler>();
 builder.Services.AddSingleton<IMapper, Mapper>(_ => mapper);
 builder.Services.AddDistributedMemoryCache();
