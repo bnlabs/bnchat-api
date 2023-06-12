@@ -1,6 +1,8 @@
 appsettings.json
+buildInfo.json
 obj
 bin
 .vs
 .vscode
 publish
+tools
