@@ -31,14 +31,9 @@ jobs:
       #   run: dotnet build --configuration Release
 
       - name: Run the Cake script
-        uses: cake-build/cake-action@v1
-        with:
-          cake-version: tool-manifest
-          script-path: ../build.cake
-          target: Test
-          # arguments: |
-          #   name: value
-          #   configuration: Release
+        run: |
+         dotnet restore
+         dotnet cake ../build.cake
 
       - name: dotnet publish
         run: dotnet publish -c Debug --property:PublishDir=${{env.DOTNET_ROOT}}/myapp
