@@ -1,8 +1,16 @@
+# settings
 appsettings.json
 buildInfo.json
+
+# vs and vscode
 obj
 bin
 .vs
 .vscode
+
+# Cake tools and publish
 publish
 tools
+
+# Rider
+.idea
