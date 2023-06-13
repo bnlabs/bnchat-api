@@ -7,7 +7,7 @@ using ToffApi.Models;
 
 namespace ToffApi.Hubs;
 
-// [Authorize]
+[Authorize]
 public class MessageHub : Hub
 {
     private readonly IMessageDataAccess _messageDataAccess;
