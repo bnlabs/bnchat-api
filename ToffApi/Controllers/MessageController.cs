@@ -27,7 +27,9 @@ namespace ToffApi.Controllers
                 c.Messages = await _messageDataAccess.GetMessagesFromConversation(userId, c.ConversationId);
             }
 
-            return Ok(conversations);
+            var token = HttpContext.Request.Cookies["X-Access-Token"];
+            var result = new { conversations, token};
+            return Ok(result);
         }
         
         // This should be a signalR hub method

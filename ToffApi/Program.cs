@@ -114,7 +114,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAllHeaders",
         b =>
         {
-            b.WithOrigins("http://127.0.0.1:5173", "https://chat.pancho.moe")
+            b.WithOrigins("http://127.0.0.1:5173", "https://chat.pancho.moe", "http://localhost:5173")
                 .AllowAnyMethod()
                 .AllowAnyHeader()
                 .AllowCredentials();
