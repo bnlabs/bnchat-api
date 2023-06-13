@@ -32,7 +32,7 @@ jobs:
          dotnet cake ../build.cake
 
       - name: dotnet publish
-        run: dotnet publish -c Debug --property:PublishDir=${{env.DOTNET_ROOT}}/myapp
+        run: dotnet publish -c Debug --property:PublishDir=${{env.DOTNET_ROOT}}/myapp /p:EnvironmentName=Development
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
