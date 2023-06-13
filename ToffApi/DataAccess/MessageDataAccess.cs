@@ -53,5 +53,12 @@ public class MessageDataAccess : IMessageDataAccess
         var result = await conversationCollection.FindAsync(c => c.MemberIds.Contains(userId));
         return await result.ToListAsync();
     }
+
+    public async Task<List<Conversation>> GetConversationById(Guid conversationId)
+    {
+        var conversationCollection = ConnectToMongo<Conversation>(ConversationCollection);
+        var result = await conversationCollection.FindAsync(c => c.ConversationId == conversationId);
+        return await result.ToListAsync();
+    }
     
 }
