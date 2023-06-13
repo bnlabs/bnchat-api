@@ -7,7 +7,7 @@ using ToffApi.Models;
 namespace ToffApi.Controllers
 {
     [Authorize]
-    [Route("api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class MessageController : ControllerBase
     {
@@ -26,10 +26,7 @@ namespace ToffApi.Controllers
             {
                 c.Messages = await _messageDataAccess.GetMessagesFromConversation(userId, c.ConversationId);
             }
-
-            var token = HttpContext.Request.Cookies["X-Access-Token"];
-            var result = new { conversations, token};
-            return Ok(result);
+            return Ok(conversations);
         }
         
         // This should be a signalR hub method
