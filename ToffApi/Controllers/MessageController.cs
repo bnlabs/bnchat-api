@@ -29,22 +29,6 @@ namespace ToffApi.Controllers
             return Ok(conversations);
         }
         
-        // This should be a signalR hub method
-        // [HttpPost("addMessage")]
-        // public async Task<IActionResult> AddMessage(MessageDto msg)
-        // {
-        //     var messageMapped = new Message
-        //     {
-        //         SenderName = msg.SenderName,
-        //         SenderId = msg.SenderId,
-        //         Content = msg.Content,
-        //         ConversationId = msg.ConversationId,
-        //         Timestamp = DateTime.Now
-        //     };
-        //     
-        //     await _messageDataAccess.AddMessage(messageMapped);
-        //     return Ok();
-        // }
         
         [HttpPost("createConversation")]
         public async Task<IActionResult> CreateConversation(ConversationDto conversationDto)

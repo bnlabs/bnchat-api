@@ -39,7 +39,7 @@ namespace ToffApi.AuthenticationService
 
             var tokenHandler = new JwtSecurityTokenHandler();
 
-            SecurityToken accessToken = tokenHandler.CreateToken(tokenDescriptor);
+            var accessToken = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(accessToken);
         }
