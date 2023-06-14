@@ -73,6 +73,7 @@ namespace ToffApi.Controllers
                         var token = _accessTokenManager.GenerateToken(appUser, new List<string>());
                         Response.Cookies.Append("X-Access-Token", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.None, Secure = true });
                         return Ok(new { Result = result,
+                                    id = appUser.Id,
                                     username = appUser.UserName,
                                     email = appUser.Email,
                                     token = _accessTokenManager.GenerateToken(appUser, new List<string>())
