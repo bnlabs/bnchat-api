@@ -9,4 +9,6 @@ public class ConversationDto
     [Required]
     public List<Guid> MemberIds { get; set; }
     public List<Message> Messages { get; set; }
+
+    public Dictionary<Guid, string> MemberMap { get; set; }
 }

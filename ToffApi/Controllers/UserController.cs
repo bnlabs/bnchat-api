@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ToffApi.DataAccess;
+using ToffApi.DtoModels;
 
 namespace ToffApi.Controllers
 {
@@ -22,9 +23,13 @@ namespace ToffApi.Controllers
         [HttpGet("getUserById")]
         public async Task<IActionResult> GetUserById(Guid userId)
         {
-            var users = await _userDataAccess.GetUserById(userId);
-
-            return Ok(users[0]);
+            var users = await _userDataAccess.GetUserByIdAsync(userId);
+            var resultUser = new UserDto()
+            {
+                Name = users[0].UserName,
+                Id = users[0].Id
+            };
+            return Ok(resultUser);
         }
     }
 }

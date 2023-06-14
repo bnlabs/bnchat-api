@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ToffApi.AuthenticationService;
@@ -16,20 +17,36 @@ namespace ToffApi.Controllers
         private readonly IMessageDataAccess _messageDataAccess;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly JwtSecurityTokenHandler _tokenHandler;
+        private readonly IUserDataAccess _userDataAccess;
 
         public MessageController(IMessageDataAccess messageDataAccess,
-            IHttpContextAccessor httpContextAccessor, JwtSecurityTokenHandler tokenHandler)
+            IHttpContextAccessor httpContextAccessor, JwtSecurityTokenHandler tokenHandler, IUserDataAccess userDataAccess)
         {
             _messageDataAccess = messageDataAccess;
             _httpContextAccessor = httpContextAccessor;
             _tokenHandler = tokenHandler;
+            _userDataAccess = userDataAccess;
         }
         
         [HttpGet("getConversation")]
         public async Task<IActionResult> GetConversationByUserId(Guid userId)
         {
             var conversations = await _messageDataAccess.GetConversationByUserId(userId);
-            return Ok(conversations);
+            var conversationResultList = conversations.Select(c => new ConversationDto
+            {
+                ConversationId = c.ConversationId,
+                MemberIds = c.MemberIds
+            }).ToList();
+
+            foreach (var c in conversationResultList)
+            {
+                var memberMap = c.MemberIds.ToDictionary(
+                    id => id,
+                    id => _userDataAccess.GetUserById(id)[0].UserName
+                );
+                c.MemberMap = memberMap;
+            }
+            return Ok(conversationResultList);
         }
 
         [HttpGet("getConversationById")]

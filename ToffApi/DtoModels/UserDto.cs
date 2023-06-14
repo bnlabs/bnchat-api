@@ -4,6 +4,7 @@ namespace ToffApi.DtoModels
 {
     public class UserDto
     {
+        public Guid Id { get; set; }
         [Required]
         public string Name { get; set; }
 

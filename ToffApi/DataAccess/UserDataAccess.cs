@@ -22,10 +22,16 @@ public class UserDataAccess : IUserDataAccess
         return db.GetCollection<T>(collection);
     }
 
-    public async Task<List<User>> GetUserById(Guid userId)
+    public async Task<List<User>> GetUserByIdAsync(Guid userId)
     {
         var userCollection = ConnectToMongo<User>(UserCollection);
         var result = await userCollection.FindAsync(u => u.Id == userId);
         return await result.ToListAsync();
+    }
+    public  List<User> GetUserById(Guid userId)
+    {
+        var userCollection = ConnectToMongo<User>(UserCollection);
+        var result = userCollection.Find(u => u.Id == userId);
+        return result.ToList();
     }
 }
