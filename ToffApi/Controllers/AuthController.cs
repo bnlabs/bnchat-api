@@ -14,25 +14,16 @@ namespace ToffApi.Controllers
     public class AuthController : ControllerBase
     {
         private readonly UserManager<User> _userManager;
-        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly IAccessTokenManager _accessTokenManager;
-        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly SignInManager<User> _signInManager;
-        private readonly JwtSecurityTokenHandler _tokenHandler;
 
         public AuthController(UserManager<User> userManager,
-            RoleManager<ApplicationRole> roleManager,
             IAccessTokenManager accessTokenManager,
-            IHttpContextAccessor httpContextAccessor,
-            SignInManager<User> signInManager,
-            JwtSecurityTokenHandler tokenHandler)
+            SignInManager<User> signInManager)
         {
             this._userManager = userManager;
-            this._roleManager = roleManager;
             this._accessTokenManager = accessTokenManager;
-            this._httpContextAccessor = httpContextAccessor;
             this._signInManager = signInManager;
-            this._tokenHandler = tokenHandler;
         }
 
         [HttpPost("/auth/signup")]

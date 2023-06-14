@@ -24,7 +24,7 @@ namespace ToffApi.Controllers
         {
             var users = await _userDataAccess.GetUserById(userId);
 
-            return Ok();
+            return Ok(users[0]);
         }
     }
 }

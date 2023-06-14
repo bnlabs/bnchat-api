@@ -14,18 +14,15 @@ public class MessageHub : Hub
 {
     private readonly IMessageDataAccess _messageDataAccess;
     private readonly IMapper _mapper;
-    private readonly IUserDataAccess _userDataAccess;
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly JwtSecurityTokenHandler _tokenHandler;
     public MessageHub(IMessageDataAccess messageDataAccess,
         IMapper mapper,
-        IUserDataAccess userDataAccess, 
         IHttpContextAccessor httpContextAccessor,
         JwtSecurityTokenHandler tokenHandler)
     {
         _messageDataAccess = messageDataAccess;
         _mapper = mapper;
-        _userDataAccess = userDataAccess;
         _httpContextAccessor = httpContextAccessor;
         _tokenHandler = tokenHandler;
     }
@@ -82,7 +79,7 @@ public class MessageHub : Hub
         {
             throw new UnauthorizedAccessException();
         }
-        //
+
         var groupName = $"conversation-{conversationId}";
         await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
         await Clients.Group(groupName).SendAsync("UserJoined", groupName);

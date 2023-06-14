@@ -55,7 +55,7 @@ namespace ToffApi.AuthenticationService
         {
             var authorizationHeader = _httpContextAccessor.HttpContext.Request.Headers["authorization"];
 
-            return authorizationHeader == StringValues.Empty ? string.Empty : authorizationHeader.Single().Split(" ").Last();
+            return authorizationHeader == StringValues.Empty ? string.Empty : authorizationHeader.Single().Split(" ")[authorizationHeader.Single().Split(" ").Length - 1];
         }
 
         private static string GetKey(string token) => $"tokens:{token}:deactivated";
