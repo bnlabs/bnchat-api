@@ -29,10 +29,6 @@ namespace ToffApi.Controllers
         public async Task<IActionResult> GetConversationByUserId(Guid userId)
         {
             var conversations = await _messageDataAccess.GetConversationByUserId(userId);
-            foreach (var c in conversations)
-            {
-                c.Messages = await _messageDataAccess.GetMessagesFromConversation(userId, c.ConversationId);
-            }
             return Ok(conversations);
         }
 
