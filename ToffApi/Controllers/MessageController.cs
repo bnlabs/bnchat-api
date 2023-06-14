@@ -14,8 +14,8 @@ namespace ToffApi.Controllers
     public class MessageController : ControllerBase
     {
         private readonly IMessageDataAccess _messageDataAccess;
-        private IHttpContextAccessor _httpContextAccessor;
-        private JwtSecurityTokenHandler _tokenHandler;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly JwtSecurityTokenHandler _tokenHandler;
 
         public MessageController(IMessageDataAccess messageDataAccess,
             IHttpContextAccessor httpContextAccessor, JwtSecurityTokenHandler tokenHandler)
@@ -35,7 +35,13 @@ namespace ToffApi.Controllers
             }
             return Ok(conversations);
         }
-        
+
+        [HttpGet("getConversationById")]
+        public async Task<IActionResult> GetConversationById(Guid conversationId)
+        {
+            var result = await _messageDataAccess.GetConversationById(conversationId);
+            return Ok(result[0]);
+        }
         
         [HttpPost("createConversation")]
         public async Task<IActionResult> CreateConversation(ConversationDto conversationDto)
