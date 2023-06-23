@@ -45,6 +45,7 @@ namespace ToffApi.Controllers
                     id => _userDataAccess.GetUserById(id)[0].UserName
                 );
                 c.MemberMap = memberMap;
+                c.Messages = await _messageDataAccess.GetMessagesFromConversation(userId, c.ConversationId);
             }
             return Ok(conversationResultList);
         }
