@@ -46,6 +46,7 @@ namespace ToffApi.Controllers
                 );
                 c.MemberMap = memberMap;
                 c.Messages = await _messageDataAccess.GetMessagesFromConversation(userId, c.ConversationId);
+                c.Messages = c.Messages.OrderByDescending(m => m.Timestamp).ToList();
             }
             return Ok(conversationResultList);
         }
