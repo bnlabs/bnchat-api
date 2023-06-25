@@ -34,4 +34,11 @@ public class UserDataAccess : IUserDataAccess
         var result = userCollection.Find(u => u.Id == userId);
         return result.ToList();
     }
+
+    public async Task<List<User>> SearchUser(string searchInput)
+    {
+        var userCollection = ConnectToMongo<User>(UserCollection);
+        var result = await userCollection.FindAsync(u => u.UserName.ToLower().Contains(searchInput.ToLower()));
+        return result.ToList();
+    }
 }
