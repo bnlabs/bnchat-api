@@ -1,9 +1,8 @@
 ﻿using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using ToffApi.Models;
 using Message = ToffApi.Models.Message;
 
-namespace ToffApi.DataAccess;
+namespace ToffApi.Services.DataAccess;
 
 public class MessageDataAccess : IMessageDataAccess
 {

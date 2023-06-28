@@ -1,13 +1,12 @@
-﻿using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using ToffApi.Models;
 
-
-namespace ToffApi.AuthenticationService
+namespace ToffApi.Services.AuthenticationService
 {
     public class AccessTokenManager : IAccessTokenManager
     {

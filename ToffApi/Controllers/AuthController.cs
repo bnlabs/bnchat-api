@@ -2,10 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using ToffApi.DtoModels;
-using ToffApi.AuthenticationService;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 using ToffApi.Models;
+using ToffApi.Services.AuthenticationService;
 
 namespace ToffApi.Controllers
 {
@@ -67,7 +67,8 @@ namespace ToffApi.Controllers
                                     id = appUser.Id,
                                     username = appUser.UserName,
                                     email = appUser.Email,
-                                    token = _accessTokenManager.GenerateToken(appUser, new List<string>())
+                                    pictureUrl = appUser.PictureUrl,
+                                    Token = token
                                 });
                     }
                 }

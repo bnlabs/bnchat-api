@@ -1,6 +1,6 @@
 ﻿using ToffApi.Models;
 
-namespace ToffApi.AuthenticationService
+namespace ToffApi.Services.AuthenticationService
 {
     public interface IAccessTokenManager
     {

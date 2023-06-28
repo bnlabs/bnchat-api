@@ -1,5 +1,4 @@
 using Microsoft.OpenApi.Models;
-using ToffApi.AuthenticationService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Configuration;
@@ -10,16 +9,23 @@ using AutoMapper;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using ToffApi;
 using ToffApi.Models;
-using ToffApi.DataAccess;
 using ToffApi.DtoModels;
 using ToffApi.Hubs;
+using ToffApi.Services.AuthenticationService;
+using ToffApi.Services.CloudFlareR2Service;
+using ToffApi.Services.DataAccess;
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// read from appsettings.json
+// read from appsettings.json (MongoDb)
 var mongoDbSettings = builder.Configuration.GetSection(nameof(MongoDbConfig)).Get<MongoDbConfig>();
 var mongoDbName = mongoDbSettings.Name;
+
+// read from appsettings.json (CloudFlare R2)
+var accessKeyR2 = builder.Configuration["R2:AccessKey"];
+var secretKeyR2 = builder.Configuration["R2:SecretKey"];
+var r2Url = builder.Configuration["R2:Url"];;
 
 // Mapper config
 var mapperConfiguration = new MapperConfiguration(cfg => 
@@ -39,6 +45,7 @@ builder.Services
     .AddMongoDbStores<User, ApplicationRole, Guid>(mongoDbSettings.ConnectionString, mongoDbSettings.Name);
 builder.Services.AddSingleton<IAccessTokenManager, AccessTokenManager>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddSingleton<IR2Service, R2Service>(provider => new R2Service(accessKeyR2, secretKeyR2, r2Url));
 builder.Services.AddSingleton<IMessageDataAccess, MessageDataAccess>(provider => new MessageDataAccess(mongoDbSettings.ConnectionString,
     mongoDbName));
 builder.Services.AddSingleton<IUserDataAccess, UserDataAccess>(provider => new UserDataAccess(mongoDbSettings.ConnectionString,

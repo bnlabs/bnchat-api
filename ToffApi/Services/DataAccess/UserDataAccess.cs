@@ -1,7 +1,7 @@
 ﻿using MongoDB.Driver;
 using ToffApi.Models;
 
-namespace ToffApi.DataAccess;
+namespace ToffApi.Services.DataAccess;
 
 public class UserDataAccess : IUserDataAccess
 {
@@ -40,5 +40,18 @@ public class UserDataAccess : IUserDataAccess
         var userCollection = ConnectToMongo<User>(UserCollection);
         var result = await userCollection.FindAsync(u => u.UserName.ToLower().Contains(searchInput.ToLower()));
         return result.ToList();
+    }
+
+    public async Task<string> UpdateUserPfp(Guid userId, string url)
+    {
+        var userCollection = ConnectToMongo<User>(UserCollection);
+        var userResult = await userCollection.FindAsync(u => u.Id == userId);
+        var user = userResult.ToList()[0];
+        user.PictureUrl = url;
+        
+        var filter = Builders<User>.Filter.Eq(u => u.Id, userId);
+        var update = Builders<User>.Update.Set(u => u.PictureUrl, url);
+        await userCollection.UpdateOneAsync(filter, update);
+        return url;
     }
 }

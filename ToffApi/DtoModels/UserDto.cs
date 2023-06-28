@@ -7,6 +7,7 @@ namespace ToffApi.DtoModels
         public Guid Id { get; set; }
         [Required]
         public string Name { get; set; }
+        public string PictureUrl { get; set; }
 
         [Required]
         [EmailAddress(ErrorMessage = "Invalid Email")]

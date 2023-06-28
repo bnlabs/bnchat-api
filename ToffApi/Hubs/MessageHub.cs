@@ -3,9 +3,9 @@ using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using ToffApi.DataAccess;
 using ToffApi.DtoModels;
 using ToffApi.Models;
+using ToffApi.Services.DataAccess;
 
 namespace ToffApi.Hubs;
 

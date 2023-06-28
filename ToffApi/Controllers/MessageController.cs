@@ -2,10 +2,9 @@ using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ToffApi.AuthenticationService;
-using ToffApi.DataAccess;
 using ToffApi.DtoModels;
 using ToffApi.Models;
+using ToffApi.Services.DataAccess;
 
 namespace ToffApi.Controllers
 {

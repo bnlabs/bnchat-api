@@ -1,6 +1,6 @@
 ﻿using ToffApi.Models;
 
-namespace ToffApi.DataAccess;
+namespace ToffApi.Services.DataAccess;
 
 public interface IMessageDataAccess
 {
