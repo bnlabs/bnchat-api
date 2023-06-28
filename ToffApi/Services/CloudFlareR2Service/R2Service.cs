@@ -8,7 +8,7 @@ namespace ToffApi.Services.CloudFlareR2Service;
 public class R2Service : IR2Service
 {
     private const string Bucket = "pfp";
-    private IAmazonS3 _s3Client;
+    private readonly IAmazonS3 _s3Client;
 
     public R2Service(string accessKey, string secretKey, string r2Url)
     {
@@ -31,7 +31,7 @@ public class R2Service : IR2Service
             Key = key,
             DisablePayloadSigning = true
         };
-        transferUtility.Upload(uploadRequest);
+        await transferUtility.UploadAsync(uploadRequest);
         
         return $"https://pub-b0e080cfcdcc4f508a242564465e3975.r2.dev/{key}";
     }

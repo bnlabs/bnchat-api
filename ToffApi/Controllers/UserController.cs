@@ -20,15 +20,13 @@ namespace ToffApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserDataAccess _userDataAccess;
-        private readonly IMapper _mapper;
         private readonly IR2Service _r2Service;
         private readonly JwtSecurityTokenHandler _tokenHandler;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserController(IUserDataAccess userDataAccess, IMapper mapper, IR2Service r2Service, JwtSecurityTokenHandler tokenHandler, IHttpContextAccessor httpContextAccessor)
+        public UserController(IUserDataAccess userDataAccess, IR2Service r2Service, JwtSecurityTokenHandler tokenHandler, IHttpContextAccessor httpContextAccessor)
         {
             _userDataAccess = userDataAccess;
-            _mapper = mapper;
             _r2Service = r2Service;
             _tokenHandler = tokenHandler;
             _httpContextAccessor = httpContextAccessor;

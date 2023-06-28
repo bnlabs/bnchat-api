@@ -25,7 +25,7 @@ var mongoDbName = mongoDbSettings.Name;
 // read from appsettings.json (CloudFlare R2)
 var accessKeyR2 = builder.Configuration["R2:AccessKey"];
 var secretKeyR2 = builder.Configuration["R2:SecretKey"];
-var r2Url = builder.Configuration["R2:Url"];;
+var r2Url = builder.Configuration["R2:Url"];
 
 // Mapper config
 var mapperConfiguration = new MapperConfiguration(cfg => 
