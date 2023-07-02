@@ -1,0 +1,14 @@
+# Use the official .NET SDK image as the base image
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS build
+
+EXPOSE 80
+EXPOSE 443
+
+# Set the working directory inside the container
+WORKDIR /
+
+# Copy the remaining source code to the container
+COPY /publish .
+
+# Set the entry point for the container
+CMD ["dotnet", "ToffApi.dll"]

@@ -33,3 +33,25 @@ jobs:
       - name: Test
         run: |
           dotnet test
+
+  # docker-upload:
+  #     runs-on: ubuntu-latest
+
+  #     steps:
+  #     - name: Checkout source code
+  #       uses: actions/checkout@v3
+
+  #     - name: Set up .NET Core
+  #       uses: actions/setup-dotnet@v3
+  #       with:
+  #         dotnet-version: '7.0.x'
+
+  #     - name: Build
+  #       run: |
+  #         cd toffapi
+  #         dotnet build --configuration Release
+
+  #     - name: Build docker image
+  #       run: docker build -t ${{secrets.DOCKER_USERNAME}}/toff-api .
+
+      
