@@ -1,6 +1,5 @@
 using Amazon.Runtime;
 using Amazon.S3;
-using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 
 namespace ToffApi.Services.CloudFlareR2Service;
@@ -35,5 +34,4 @@ public class R2Service : IR2Service
         
         return $"https://pub-b0e080cfcdcc4f508a242564465e3975.r2.dev/{key}";
     }
-    
 }

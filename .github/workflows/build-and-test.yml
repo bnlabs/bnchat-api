@@ -23,7 +23,6 @@ jobs:
 
       - name: Restore dependencies
         run: |
-          ls
           dotnet restore
           dotnet tool restore
 

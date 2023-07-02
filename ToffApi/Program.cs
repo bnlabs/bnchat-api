@@ -1,12 +1,9 @@
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Cors;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
-using Microsoft.AspNetCore.Cors.Infrastructure;
 using ToffApi;
 using ToffApi.Models;
 using ToffApi.DtoModels;
