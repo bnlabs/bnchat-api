@@ -7,9 +7,9 @@ using ToffApi.Services.DataAccess;
 
 namespace ToffApi.Controllers
 {
+    [Authorize]
     [Route("[controller]")]
     [ApiController]
-    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserDataAccess _userDataAccess;
@@ -36,6 +36,26 @@ namespace ToffApi.Controllers
                 PictureUrl = users[0].PictureUrl
             };
             return Ok(resultUser);
+        }
+
+        [HttpPost("getUsers")]
+        public async Task<IActionResult> GetUsersById([FromBody]List<Guid> listOfUserId)
+        {
+            var result = new List<UserDto>();
+            foreach (var id in listOfUserId.Distinct())
+            {
+                var userList = await _userDataAccess.GetUserByIdAsync(id);
+                var user = userList[0];
+                var userDto = new UserDto()
+                {
+                    Id = user.Id,
+                    Name = user.UserName,
+                    PictureUrl = user.PictureUrl
+                };
+                result.Add(userDto);
+            }
+            
+            return Ok(result);
         }
 
         [HttpGet("SearchUsername")]
@@ -73,6 +93,5 @@ namespace ToffApi.Controllers
             return Ok(new { url });
 
         }
-
     }
 }
