@@ -62,4 +62,17 @@ public class MessageCommandHandler : CommandHandler
     {
         return _messageDataAccess.GetConversationBetweenUsers(userId1, userId2);
     }
+    
+    // TODO: test this
+    public async Task<GetConversationBetweenUsersQueryResult> HandleAsync(GetConversationBetweenUsersQuery query)
+    {
+        var conversation = await _messageDataAccess.GetConversationBetweenUsers(query.UserId1, query.UserId2);
+        var conversationQueryResult = new GetConversationBetweenUsersQueryResult()
+        {
+            MemberIds = conversation.MemberIds,
+            Messages = conversation.Messages,
+            ConversationId = conversation.ConversationId
+        };
+        return conversationQueryResult;
+    }
 }
