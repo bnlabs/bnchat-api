@@ -2,10 +2,10 @@ namespace ToffApi.Command.CommandResults;
 
 public class SendDmMessageCommandResult
 {
-    public Guid Id;
-    public Guid ConversationId;
-    public string SenderName;
-    public Guid SenderId;
-    public string Content;
-    public DateTime Timestamp;
+    public Guid Id { get; set; }
+    public Guid ConversationId { get; set; }
+    public string SenderName { get; set; }
+    public Guid SenderId { get; set; }
+    public string Content { get; set; }
+    public DateTime Timestamp { get; set; }
 }

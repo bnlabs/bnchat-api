@@ -1,12 +1,8 @@
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ToffApi.DtoModels;
-using ToffApi.Models;
 using ToffApi.Query.Queries;
 using ToffApi.Query.QueryHandlers;
-using ToffApi.Query.QueryResults;
-using ToffApi.Services.DataAccess;
 
 namespace ToffApi.Controllers
 {
@@ -15,18 +11,12 @@ namespace ToffApi.Controllers
     [ApiController]
     public class MessageController : Controller
     {
-        private readonly IMessageDataAccess _messageDataAccess;
-        private readonly IUserDataAccess _userDataAccess;
         private readonly MessageQueryHandler _messageQueryHandler;
-
         public MessageController(JwtSecurityTokenHandler tokenHandler,
             IHttpContextAccessor httpContextAccessor,
-            IMessageDataAccess messageDataAccess,
-            IUserDataAccess userDataAccess, 
-            MessageQueryHandler messageQueryHandler) : base(tokenHandler, httpContextAccessor)
+            MessageQueryHandler messageQueryHandler) 
+            : base(tokenHandler, httpContextAccessor)
         {
-            _messageDataAccess = messageDataAccess;
-            _userDataAccess = userDataAccess;
             _messageQueryHandler = messageQueryHandler;
         }
         

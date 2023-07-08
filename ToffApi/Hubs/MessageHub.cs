@@ -3,12 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authorization;
 using ToffApi.Command.CommandBuses;
 using ToffApi.Command.CommandHandlers;
-using ToffApi.Models;
 using ToffApi.Services.DataAccess;
-using ToffApi.Exceptions;
-using ToffApi.Query.Queries;
-using ToffApi.Query.QueryHandlers;
-using ToffApi.Query.QueryResults;
 
 namespace ToffApi.Hubs;
 
@@ -17,69 +12,27 @@ public class MessageHub : ToffHub
 {
     private readonly IMessageDataAccess _messageDataAccess;
     private readonly MessageCommandHandler _messageCommandHandler;
-    private readonly MessageQueryHandler _messageQueryHandler;
 
     public MessageHub(
         JwtSecurityTokenHandler tokenHandler,
         IHttpContextAccessor httpContextAccessor,
         MessageCommandHandler messageCommandHandler,
-        IMessageDataAccess messageDataAccess, 
-        MessageQueryHandler messageQueryHandler) :
+        IMessageDataAccess messageDataAccess) :
         base(tokenHandler, httpContextAccessor)
     {
         _messageDataAccess = messageDataAccess;
-        _messageQueryHandler = messageQueryHandler;
         _messageCommandHandler = messageCommandHandler;
     }
 
     public async Task SendMessage(SendDmMessageCommand command)
     {
         var userId = ExtractUserId();
-        
-        var conversation = new GetConversationBetweenUsersQueryResult();
-        var groupName = string.Empty;
+        command.SenderId = new Guid(userId);
 
-        var getConversationQuery = new GetConversationBetweenUsersQuery(new Guid(userId), command.ReceiverId);
-        // check if conversation already exist, if it does, then get conversation
-        try
-        {
-            conversation = await _messageQueryHandler.HandleAsync(getConversationQuery);
-            groupName = $"conversation-{conversation.ConversationId}";
-        
-            var msg = new Message()
-            {
-                ConversationId = conversation.ConversationId,
-                SenderId = command.SenderId,
-                SenderName = command.SenderName,
-                Content = command.Content
-            };
-        
-            await _messageDataAccess.AddMessage(msg);
-            await Clients.Group(groupName).SendAsync("ReceiveMessage", msg);
-        }
-        catch (ConversationNotFoundException e)
-        {
-            var memberList = new List<Guid>
-            {
-                new Guid(userId),
-                command.ReceiverId
-            };
+        var commandResult = await _messageCommandHandler.HandleAsync(command);
+        var groupName = $"conversation-{commandResult.ConversationId}";
 
-            var c = new Conversation(memberList);
-            await _messageDataAccess.AddConversation(c);
-            conversation = await _messageQueryHandler.HandleAsync(getConversationQuery);
-            groupName = $"conversation-{conversation.ConversationId}";
-            
-            var msg = new Message()
-            {
-                ConversationId = conversation.ConversationId,
-                SenderId = command.SenderId,
-                SenderName = command.SenderName,
-                Content = command.Content
-            };
-            await _messageDataAccess.AddMessage(msg);
-            await Clients.Group(groupName).SendAsync("ReceiveMessage", msg);
-        }
+        await Clients.Group(groupName).SendAsync("ReceiveMessage", commandResult);
     }
 
     public async Task JoinGroup(Guid conversationId)

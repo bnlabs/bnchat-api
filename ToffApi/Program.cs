@@ -54,6 +54,7 @@ builder.Services.AddSingleton<IUserDataAccess, UserDataAccess>(provider => new U
     mongoDbName));
 builder.Services.AddSingleton<MessageCommandHandler>();
 builder.Services.AddSingleton<MessageQueryHandler>();
+builder.Services.AddSingleton<UserQueryHandler>();
 builder.Services.AddSingleton<JwtSecurityTokenHandler>();
 builder.Services.AddSingleton<IMapper, Mapper>(_ => mapper);
 builder.Services.AddDistributedMemoryCache();
