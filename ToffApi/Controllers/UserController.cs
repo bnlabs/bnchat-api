@@ -17,7 +17,11 @@ namespace ToffApi.Controllers
         private readonly JwtSecurityTokenHandler _tokenHandler;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public UserController(IUserDataAccess userDataAccess, IR2Service r2Service, JwtSecurityTokenHandler tokenHandler, IHttpContextAccessor httpContextAccessor)
+        public UserController(JwtSecurityTokenHandler tokenHandler,
+            IHttpContextAccessor httpContextAccessor,
+            IUserDataAccess userDataAccess,
+            IR2Service r2Service)
+            : base(tokenHandler, httpContextAccessor)
         {
             _userDataAccess = userDataAccess;
             _r2Service = r2Service;

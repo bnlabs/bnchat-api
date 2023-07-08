@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ToffApi.DtoModels;
 using ToffApi.Models;
+using ToffApi.Query.Queries;
+using ToffApi.Query.QueryHandlers;
+using ToffApi.Query.QueryResults;
 using ToffApi.Services.DataAccess;
 
 namespace ToffApi.Controllers
@@ -13,49 +16,35 @@ namespace ToffApi.Controllers
     public class MessageController : Controller
     {
         private readonly IMessageDataAccess _messageDataAccess;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly JwtSecurityTokenHandler _tokenHandler;
         private readonly IUserDataAccess _userDataAccess;
+        private readonly MessageQueryHandler _messageQueryHandler;
 
-        public MessageController(IMessageDataAccess messageDataAccess,
-            IHttpContextAccessor httpContextAccessor, JwtSecurityTokenHandler tokenHandler, IUserDataAccess userDataAccess)
+        public MessageController(JwtSecurityTokenHandler tokenHandler,
+            IHttpContextAccessor httpContextAccessor,
+            IMessageDataAccess messageDataAccess,
+            IUserDataAccess userDataAccess, 
+            MessageQueryHandler messageQueryHandler) : base(tokenHandler, httpContextAccessor)
         {
             _messageDataAccess = messageDataAccess;
-            _httpContextAccessor = httpContextAccessor;
-            _tokenHandler = tokenHandler;
             _userDataAccess = userDataAccess;
+            _messageQueryHandler = messageQueryHandler;
         }
         
-        // there is a handleAsync
         [HttpGet("getConversation")]
-        public async Task<IActionResult> GetConversationByUserId(Guid userId)
+        public async Task<IActionResult> GetConversationByUserId()
         {
-            var conversations = await _messageDataAccess.GetConversationByUserId(userId);
-            var conversationResultList = conversations.Select(c => new ConversationDto
-            {
-                ConversationId = c.ConversationId,
-                MemberIds = c.MemberIds
-            }).ToList();
-
-            foreach (var c in conversationResultList)
-            {
-                var memberMap = c.MemberIds.ToDictionary(
-                    id => id,
-                    id => _userDataAccess.GetUserById(id)[0].UserName
-                );
-                c.MemberMap = memberMap;
-                c.Messages = await _messageDataAccess.GetMessagesFromConversation(userId, c.ConversationId);
-                c.Messages = c.Messages.OrderByDescending(m => m.Timestamp).ToList();
-            }
-            return Ok(conversationResultList);
+            var userId = new Guid(ExtractUserId());
+            var query = new GetConversationsByUserIdQuery(userId);
+            var queryResult = await _messageQueryHandler.HandleAsync(query);
+            return Ok(queryResult.ConversationList);
         }
-
-        // there is a handleAsync
+        
         [HttpGet("getConversationById")]
         public async Task<IActionResult> GetConversationById(Guid conversationId)
         {
-            var result = await _messageDataAccess.GetConversationById(conversationId);
-            return Ok(result[0]);
+            var query = new GetConversationByIdQuery(conversationId);
+            var queryResult = await _messageQueryHandler.HandleAsync(query);
+            return Ok(queryResult);
         }
         
     }

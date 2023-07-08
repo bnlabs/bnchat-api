@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
 
@@ -7,7 +8,9 @@ namespace ToffApi.Controllers;
 [ApiController]
 public class HealthController : Controller
 {
-    public HealthController()
+    public HealthController(JwtSecurityTokenHandler tokenHandler,
+        IHttpContextAccessor httpContextAccessor) 
+        : base(tokenHandler, httpContextAccessor)
     {
 
     }

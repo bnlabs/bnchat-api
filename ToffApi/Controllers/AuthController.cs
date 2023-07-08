@@ -17,9 +17,11 @@ namespace ToffApi.Controllers
         private readonly IAccessTokenManager _accessTokenManager;
         private readonly SignInManager<User> _signInManager;
 
-        public AuthController(UserManager<User> userManager,
+        public AuthController(JwtSecurityTokenHandler tokenHandler,
+            IHttpContextAccessor httpContextAccessor,
+            UserManager<User> userManager,
             IAccessTokenManager accessTokenManager,
-            SignInManager<User> signInManager)
+            SignInManager<User> signInManager) : base(tokenHandler, httpContextAccessor)
         {
             _userManager = userManager;
             _accessTokenManager = accessTokenManager;
