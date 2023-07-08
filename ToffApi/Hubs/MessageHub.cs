@@ -1,77 +1,83 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Microsoft.AspNetCore.SignalR;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using ToffApi.DtoModels;
+using ToffApi.Command.CommandBuses;
+using ToffApi.Command.CommandHandlers;
 using ToffApi.Models;
 using ToffApi.Services.DataAccess;
+using ToffApi.Exceptions;
 
 namespace ToffApi.Hubs;
 
 [Authorize]
-public class MessageHub : Hub
+public class MessageHub : ToffHub
 {
     private readonly IMessageDataAccess _messageDataAccess;
-    private readonly IMapper _mapper;
-    private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly JwtSecurityTokenHandler _tokenHandler;
-    public MessageHub(IMessageDataAccess messageDataAccess,
-        IMapper mapper,
+    private readonly MessageCommandHandler _messageCommandHandler;
+
+    public MessageHub(
+        JwtSecurityTokenHandler tokenHandler,
         IHttpContextAccessor httpContextAccessor,
-        JwtSecurityTokenHandler tokenHandler)
+        MessageCommandHandler messageCommandHandler,
+        IMessageDataAccess messageDataAccess) :
+        base(tokenHandler, httpContextAccessor)
     {
         _messageDataAccess = messageDataAccess;
-        _mapper = mapper;
-        _httpContextAccessor = httpContextAccessor;
-        _tokenHandler = tokenHandler;
+        _messageCommandHandler = messageCommandHandler;
     }
 
-    public async Task SendMessage(MessageDto msg)
+    public async Task SendMessage(SendDmMessageCommand command)
     {
-        // Retrieve JWT from HTTP context to get userId
-        if (_httpContextAccessor.HttpContext == null)
-        {
-            throw new UnauthorizedAccessException();
-        }
+        var userId = ExtractUserId();
         
-        var tokenFromRequest = _httpContextAccessor.HttpContext.Request.Cookies["X-Access-Token"];
-        if (string.IsNullOrEmpty(tokenFromRequest))
-        {
-            throw new UnauthorizedAccessException();
-        }
+        var conversation = new Conversation();
+        var groupName = string.Empty;
         
-        var userId = _tokenHandler.ReadJwtToken(tokenFromRequest).Claims.First(claim => claim.Type == "userId").Value;
-        var conversations = await _messageDataAccess.GetConversationById(msg.ConversationId);
-        var userIdIsInConversation = conversations[0].MemberIds.Exists(id => id == new Guid(userId));
-        if (!userIdIsInConversation)
+        // check if conversation already exist, if it does, then get conversation
+        try
         {
-            throw new UnauthorizedAccessException();
+            conversation = await _messageCommandHandler.GetConversationBetweenUsers(new Guid(userId), command.ReceiverId);
+            groupName = $"conversation-{conversation.ConversationId}";
+        
+            var msg = new Message()
+            {
+                ConversationId = conversation.ConversationId,
+                SenderId = command.SenderId,
+                SenderName = command.SenderName,
+                Content = command.Content
+            };
+        
+            await _messageDataAccess.AddMessage(msg);
+            await Clients.Group(groupName).SendAsync("ReceiveMessage", msg);
         }
+        catch (ConversationNotFoundException e)
+        {
+            var memberList = new List<Guid>
+            {
+                new Guid(userId),
+                command.ReceiverId
+            };
 
-        var groupName = $"conversation-{msg.ConversationId}";
-        var mappedMessage = _mapper.Map<Message>(msg);
-
-        await _messageDataAccess.AddMessage(mappedMessage);
-        await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-        await Clients.Group(groupName).SendAsync("ReceiveMessage", mappedMessage);
+            var c = new Conversation(memberList);
+            await _messageDataAccess.AddConversation(c);
+            conversation = await _messageCommandHandler.GetConversationBetweenUsers(new Guid(userId), command.ReceiverId);
+            groupName = $"conversation-{conversation.ConversationId}";
+            
+            var msg = new Message()
+            {
+                ConversationId = conversation.ConversationId,
+                SenderId = command.SenderId,
+                SenderName = command.SenderName,
+                Content = command.Content
+            };
+            await _messageDataAccess.AddMessage(msg);
+            await Clients.Group(groupName).SendAsync("ReceiveMessage", msg);
+        }
     }
 
     public async Task JoinGroup(Guid conversationId)
     {
-        // Retrieve JWT from HTTP context to get userId
-        if (_httpContextAccessor.HttpContext == null)
-        {
-            throw new UnauthorizedAccessException();
-        }
-        
-        var tokenFromRequest = _httpContextAccessor?.HttpContext?.Request.Cookies["X-Access-Token"];
-        if (string.IsNullOrEmpty(tokenFromRequest))
-        {
-            throw new UnauthorizedAccessException();
-        }
-        
-        var userId = _tokenHandler.ReadJwtToken(tokenFromRequest).Claims.First(claim => claim.Type == "userId").Value;
+        var userId = ExtractUserId();
         var conversations = await _messageDataAccess.GetConversationById(conversationId);
         var userIdIsInConversation = conversations[0].MemberIds.Exists(id => id == new Guid(userId));
         
