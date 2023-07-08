@@ -8,13 +8,11 @@ namespace ToffApi.Query.QueryHandlers;
 
 public class UserQueryHandler : QueryHandler
 {
-    private readonly IMessageDataAccess _messageDataAccess;
     private readonly IUserDataAccess _userDataAccess;
 
-    public UserQueryHandler(IUserDataAccess userDataAccess, IMessageDataAccess messageDataAccess) : base()
+    public UserQueryHandler(IUserDataAccess userDataAccess) : base()
     {
         _userDataAccess = userDataAccess;
-        _messageDataAccess = messageDataAccess;
     }
 
     public async Task<GetUserByIdQueryResult> HandleAsync(GetUserByIdQuery query)

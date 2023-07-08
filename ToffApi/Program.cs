@@ -52,9 +52,10 @@ builder.Services.AddSingleton<IMessageDataAccess, MessageDataAccess>(provider =>
     mongoDbName));
 builder.Services.AddSingleton<IUserDataAccess, UserDataAccess>(provider => new UserDataAccess(mongoDbSettings.ConnectionString,
     mongoDbName));
+builder.Services.AddSingleton<UserCommandHandler>();
+builder.Services.AddSingleton<UserQueryHandler>();
 builder.Services.AddSingleton<MessageCommandHandler>();
 builder.Services.AddSingleton<MessageQueryHandler>();
-builder.Services.AddSingleton<UserQueryHandler>();
 builder.Services.AddSingleton<JwtSecurityTokenHandler>();
 builder.Services.AddSingleton<IMapper, Mapper>(_ => mapper);
 builder.Services.AddDistributedMemoryCache();

@@ -1,6 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Internal;
+using ToffApi.Command.CommandBuses;
+using ToffApi.Command.CommandHandlers;
 using ToffApi.DtoModels;
 using ToffApi.Exceptions;
 using ToffApi.Query.Queries;
@@ -18,17 +21,19 @@ namespace ToffApi.Controllers
         private readonly IUserDataAccess _userDataAccess;
         private readonly IR2Service _r2Service;
         private readonly UserQueryHandler _userQueryHandler;
+        private readonly UserCommandHandler _userCommandHandler;
 
         public UserController(JwtSecurityTokenHandler tokenHandler,
             IHttpContextAccessor httpContextAccessor,
             IUserDataAccess userDataAccess,
             IR2Service r2Service, 
-            UserQueryHandler userQueryHandler)
+            UserQueryHandler userQueryHandler, UserCommandHandler userCommandHandler)
             : base(tokenHandler, httpContextAccessor)
         {
             _userDataAccess = userDataAccess;
             _r2Service = r2Service;
             _userQueryHandler = userQueryHandler;
+            _userCommandHandler = userCommandHandler;
         }
 
         [HttpGet("getUserById")]
@@ -66,10 +71,11 @@ namespace ToffApi.Controllers
         public async Task<IActionResult> UploadPfp(IFormFile file)
         {
             if (file is not { Length: > 0 }) return BadRequest("No file was selected for upload");
-            var userId = ExtractUserId();
-            var pfpUrl = await _r2Service.UploadObject(file);
-            var url = await _userDataAccess.UpdateUserPfp(new Guid(userId), pfpUrl);
-            return Ok(new { url });
+            var userId = new Guid(ExtractUserId());
+            var command = new UpdatePfpCommand() { UserId = userId, File = file };
+            var commandResult = await _userCommandHandler.HandleAsync(command);
+            
+            return Ok(commandResult.Url);
 
         }
     }
