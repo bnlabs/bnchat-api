@@ -23,7 +23,6 @@ public class MessageCommandHandler : CommandHandler
 
     public async Task<SendDmMessageCommandResult> HandleAsync(SendDmMessageCommand command)
     {
-
         // check if conversation already exist, if it does, then get conversation
         var getConversationQuery = new GetConversationBetweenUsersQuery(command.SenderId, command.ReceiverId);
         var msg = new Message();
@@ -58,7 +57,6 @@ public class MessageCommandHandler : CommandHandler
                 Content = command.Content
             };
             await _messageDataAccess.AddMessage(msg);
-            
         }
 
         var commandResult = new SendDmMessageCommandResult()
