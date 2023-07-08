@@ -55,7 +55,7 @@ namespace ToffApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginDto loginInfo)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 var appUser = await _userManager.FindByEmailAsync(loginInfo.Email);
                 if (appUser != null)
@@ -69,9 +69,8 @@ namespace ToffApi.Controllers
                                     id = appUser.Id,
                                     username = appUser.UserName,
                                     email = appUser.Email,
-                                    pictureUrl = appUser.PictureUrl,
-                                    Token = token
-                                });
+                                    pictureUrl = appUser.PictureUrl
+                        });
                     }
                 }
                 ModelState.AddModelError(nameof(loginInfo.Email), "Login Failed: Invalid Email or Password");
