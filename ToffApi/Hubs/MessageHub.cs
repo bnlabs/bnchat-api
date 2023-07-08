@@ -6,6 +6,9 @@ using ToffApi.Command.CommandHandlers;
 using ToffApi.Models;
 using ToffApi.Services.DataAccess;
 using ToffApi.Exceptions;
+using ToffApi.Query.Queries;
+using ToffApi.Query.QueryHandlers;
+using ToffApi.Query.QueryResults;
 
 namespace ToffApi.Hubs;
 
@@ -14,15 +17,18 @@ public class MessageHub : ToffHub
 {
     private readonly IMessageDataAccess _messageDataAccess;
     private readonly MessageCommandHandler _messageCommandHandler;
+    private readonly MessageQueryHandler _messageQueryHandler;
 
     public MessageHub(
         JwtSecurityTokenHandler tokenHandler,
         IHttpContextAccessor httpContextAccessor,
         MessageCommandHandler messageCommandHandler,
-        IMessageDataAccess messageDataAccess) :
+        IMessageDataAccess messageDataAccess, 
+        MessageQueryHandler messageQueryHandler) :
         base(tokenHandler, httpContextAccessor)
     {
         _messageDataAccess = messageDataAccess;
+        _messageQueryHandler = messageQueryHandler;
         _messageCommandHandler = messageCommandHandler;
     }
 
@@ -30,13 +36,14 @@ public class MessageHub : ToffHub
     {
         var userId = ExtractUserId();
         
-        var conversation = new Conversation();
+        var conversation = new GetConversationBetweenUsersQueryResult();
         var groupName = string.Empty;
-        
+
+        var getConversationQuery = new GetConversationBetweenUsersQuery(new Guid(userId), command.ReceiverId);
         // check if conversation already exist, if it does, then get conversation
         try
         {
-            conversation = await _messageCommandHandler.GetConversationBetweenUsers(new Guid(userId), command.ReceiverId);
+            conversation = await _messageQueryHandler.HandleAsync(getConversationQuery);
             groupName = $"conversation-{conversation.ConversationId}";
         
             var msg = new Message()
@@ -60,7 +67,7 @@ public class MessageHub : ToffHub
 
             var c = new Conversation(memberList);
             await _messageDataAccess.AddConversation(c);
-            conversation = await _messageCommandHandler.GetConversationBetweenUsers(new Guid(userId), command.ReceiverId);
+            conversation = await _messageQueryHandler.HandleAsync(getConversationQuery);
             groupName = $"conversation-{conversation.ConversationId}";
             
             var msg = new Message()

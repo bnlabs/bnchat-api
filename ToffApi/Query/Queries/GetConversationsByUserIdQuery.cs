@@ -2,7 +2,7 @@ namespace ToffApi.Query.Queries;
 
 public class GetConversationsByUserIdQuery : Query
 {
-    public GetConversationsByUserIdQuery(IHttpContextAccessor callerContext, Guid userId) : base(callerContext)
+    public GetConversationsByUserIdQuery(Guid userId) : base()
     {
         UserId = userId;
     }
