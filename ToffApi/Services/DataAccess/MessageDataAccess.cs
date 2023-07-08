@@ -1,4 +1,5 @@
 ﻿using MongoDB.Driver;
+using ToffApi.Exceptions;
 using ToffApi.Models;
 using Message = ToffApi.Models.Message;
 
@@ -32,12 +33,11 @@ public class MessageDataAccess : IMessageDataAccess
         return results.ToList();
     }
 
-    public Task AddMessage(Message msg)
+    public async Task AddMessage(Message msg)
     {
         var messageCollection = ConnectToMongo<Message>(MessageCollection);
         msg.Timestamp = DateTime.Now;
-        messageCollection.InsertOne(msg);
-        return Task.CompletedTask;
+        await messageCollection.InsertOneAsync(msg);
     }
 
     public Task AddConversation(Conversation conversation)
@@ -85,6 +85,21 @@ public class MessageDataAccess : IMessageDataAccess
         result.ToList()[0].Messages = messages.OrderBy(m => m.Timestamp).ToList();
         
         return result;
+    }
+
+    public async Task<Conversation> GetConversationBetweenUsers(Guid userId1, Guid userId2)
+    {
+        var conversationCollection = ConnectToMongo<Conversation>(ConversationCollection);
+        var result = await conversationCollection.Find(c => c.MemberIds.Contains(userId1) 
+                                                            && c.MemberIds.Contains(userId2)).ToListAsync();
+
+        if (result.Count < 1)
+        {
+            throw new ConversationNotFoundException();
+        }
+
+        return result[0];
+
     }
     
 }

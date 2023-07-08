@@ -10,7 +10,7 @@ namespace ToffApi.Controllers
     [Authorize]
     [Route("[controller]")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UserController : Controller
     {
         private readonly IUserDataAccess _userDataAccess;
         private readonly IR2Service _r2Service;
@@ -69,7 +69,8 @@ namespace ToffApi.Controllers
                 var userDto = new UserDto()
                 {
                     Id = user.Id,
-                    Name = user.UserName
+                    Name = user.UserName,
+                    PictureUrl = user.PictureUrl
                 };
                 
                 result.Add(userDto);

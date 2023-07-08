@@ -10,6 +10,11 @@ public class Conversation
         MemberIds = memberIds;
         Messages = new List<Message>();
     }
+    public Conversation()
+    {
+        
+    }
+    
     [BsonId]
     public Guid ConversationId{ get; set; }
     public List<Guid> MemberIds { get; set; }

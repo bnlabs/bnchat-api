@@ -27,6 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Query\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

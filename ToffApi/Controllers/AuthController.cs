@@ -11,7 +11,7 @@ namespace ToffApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController : ControllerBase
+    public class AuthController : Controller
     {
         private readonly UserManager<User> _userManager;
         private readonly IAccessTokenManager _accessTokenManager;
@@ -21,9 +21,9 @@ namespace ToffApi.Controllers
             IAccessTokenManager accessTokenManager,
             SignInManager<User> signInManager)
         {
-            this._userManager = userManager;
-            this._accessTokenManager = accessTokenManager;
-            this._signInManager = signInManager;
+            _userManager = userManager;
+            _accessTokenManager = accessTokenManager;
+            _signInManager = signInManager;
         }
 
         [HttpPost("/auth/signup")]

@@ -5,6 +5,8 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using AutoMapper;
 using ToffApi;
+using ToffApi.Command.CommandHandlers;
+using ToffApi.Command.CommandResults;
 using ToffApi.Models;
 using ToffApi.DtoModels;
 using ToffApi.Hubs;
@@ -29,6 +31,8 @@ var mapperConfiguration = new MapperConfiguration(cfg =>
 {
     cfg.CreateMap<MessageDto, Message>();
     cfg.CreateMap<UserDto, User>();
+    cfg.CreateMap<SendDmMessageCommandResult, Message>();
+    cfg.CreateMap<Message, SendDmMessageCommandResult>();
 });
 var mapper = new Mapper(mapperConfiguration);
 
@@ -47,6 +51,7 @@ builder.Services.AddSingleton<IMessageDataAccess, MessageDataAccess>(provider =>
     mongoDbName));
 builder.Services.AddSingleton<IUserDataAccess, UserDataAccess>(provider => new UserDataAccess(mongoDbSettings.ConnectionString,
     mongoDbName));
+builder.Services.AddSingleton<MessageCommandHandler>();
 builder.Services.AddSingleton<JwtSecurityTokenHandler>();
 builder.Services.AddSingleton<IMapper, Mapper>(_ => mapper);
 builder.Services.AddDistributedMemoryCache();

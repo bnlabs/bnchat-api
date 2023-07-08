@@ -9,4 +9,5 @@ public interface IMessageDataAccess
     Task AddConversation(Conversation conversation);
     Task<List<Conversation>> GetConversationByUserId(Guid userId);
     Task<List<Conversation>> GetConversationById(Guid conversationId);
+    Task<Conversation> GetConversationBetweenUsers(Guid userId1, Guid userId2);
 }
