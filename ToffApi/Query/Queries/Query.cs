@@ -5,6 +5,4 @@ public abstract class Query
     protected Query()
     {
     }
-    
-
 }

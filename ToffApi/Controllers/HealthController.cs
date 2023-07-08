@@ -10,10 +10,7 @@ public class HealthController : Controller
 {
     public HealthController(JwtSecurityTokenHandler tokenHandler,
         IHttpContextAccessor httpContextAccessor) 
-        : base(tokenHandler, httpContextAccessor)
-    {
-
-    }
+        : base(tokenHandler, httpContextAccessor) {}
     
     [HttpGet("/getVersion")]
     public IActionResult Version()
