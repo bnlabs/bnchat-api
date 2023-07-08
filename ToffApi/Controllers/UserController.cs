@@ -49,21 +49,9 @@ namespace ToffApi.Controllers
         [HttpPost("getUsers")]
         public async Task<IActionResult> GetUsersById([FromBody]List<Guid> listOfUserId)
         {
-            var result = new List<UserDto>();
-            foreach (var id in listOfUserId.Distinct())
-            {
-                var userList = await _userDataAccess.GetUserByIdAsync(id);
-                var user = userList[0];
-                var userDto = new UserDto()
-                {
-                    Id = user.Id,
-                    Name = user.UserName,
-                    PictureUrl = user.PictureUrl
-                };
-                result.Add(userDto);
-            }
-            
-            return Ok(result);
+            var query = new GetUsersByIdsQuery() { ListOfUserIds = listOfUserId };
+            var queryResult = await _userQueryHandler.HandleAsync(query);
+            return Ok(queryResult.ListOfUsers);
         }
 
         [HttpGet("SearchUsername")]
