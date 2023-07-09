@@ -1,6 +1,6 @@
 name: Build and Test
 
-on: 
+on:
   pull_request:
     types: [ opened, synchronize, closed ]
   workflow_dispatch:
@@ -53,5 +53,3 @@ jobs:
 
   #     - name: Build docker image
   #       run: docker build -t ${{secrets.DOCKER_USERNAME}}/toff-api .
-
-      

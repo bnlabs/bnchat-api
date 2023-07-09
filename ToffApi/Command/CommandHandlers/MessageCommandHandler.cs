@@ -1,6 +1,9 @@
-using ToffApi.DtoModels;
+using ToffApi.Command.CommandBuses;
+using ToffApi.Command.CommandResults;
+using ToffApi.Exceptions;
 using ToffApi.Models;
 using ToffApi.Query.Queries;
+using ToffApi.Query.QueryHandlers;
 using ToffApi.Query.QueryResults;
 using ToffApi.Services.DataAccess;
 
@@ -9,57 +12,63 @@ namespace ToffApi.Command.CommandHandlers;
 public class MessageCommandHandler : CommandHandler
 {
     private readonly IMessageDataAccess _messageDataAccess;
-    private readonly IUserDataAccess _userDataAccess;
+    private readonly MessageQueryHandler _messageQueryHandler;
 
-    public MessageCommandHandler(IUserDataAccess userDataAccess, IMessageDataAccess messageDataAccess)
+    public MessageCommandHandler(IMessageDataAccess messageDataAccess,
+        MessageQueryHandler messageQueryHandler)
     {
-        _userDataAccess = userDataAccess;
         _messageDataAccess = messageDataAccess;
+        _messageQueryHandler = messageQueryHandler;
     }
 
-
-    public async Task<GetConversationByIdQueryResult> HandleAsync(GetConversationByIdQuery query)
+    public async Task<SendDmMessageCommandResult> HandleAsync(SendDmMessageCommand command)
     {
-        var conversationList = await _messageDataAccess.GetConversationById(query.ConversationId);
-        var conversation = conversationList.ToList()[0];
-        var conversationQueryResult = new GetConversationByIdQueryResult()
+        // check if conversation already exist, if it does, then get conversation
+        var getConversationQuery = new GetConversationBetweenUsersQuery(command.SenderId, command.ReceiverId);
+        var msg = new Message();
+        try
         {
-            ConversationId = conversation.ConversationId,
-            MemberIds = conversation.MemberIds,
-            Messages = conversation.Messages
-        };
+            var conversation = await _messageQueryHandler.HandleAsync(getConversationQuery);
+            msg = new Message()
+            {
+                ConversationId = conversation.ConversationId,
+                SenderId = command.SenderId,
+                SenderName = command.SenderName,
+                Content = command.Content
+            };
 
-        return conversationQueryResult;
-    }
-
-    public async Task<GetConversationsByUserIdQueryResult> HandleAsync(GetConversationsByUserIdQuery query)
-    {
-        var conversationQueryResult = new GetConversationsByUserIdQueryResult();
-        
-        var conversations = await _messageDataAccess.GetConversationByUserId(query.UserId);
-        var conversationResultList = conversations.Select(c => new ConversationDto
+            await _messageDataAccess.AddMessage(msg);
+        }
+        catch (ConversationNotFoundException)
         {
-            ConversationId = c.ConversationId,
-            MemberIds = c.MemberIds
-        }).ToList();
+            var memberList = new List<Guid>
+            {
+                command.SenderId,
+                command.ReceiverId
+            };
 
-        foreach (var c in conversationResultList)
-        {
-            var memberMap = c.MemberIds.ToDictionary(
-                id => id,
-                id => _userDataAccess.GetUserById(id)[0].UserName
-            );
-            c.MemberMap = memberMap;
-            c.Messages = await _messageDataAccess.GetMessagesFromConversation(query.UserId, c.ConversationId);
-            c.Messages = c.Messages.OrderByDescending(m => m.Timestamp).ToList();
+            var c = new Conversation(memberList);
+            await _messageDataAccess.AddConversation(c);
+            msg = new Message()
+            {
+                ConversationId = c.ConversationId,
+                SenderId = command.SenderId,
+                SenderName = command.SenderName,
+                Content = command.Content
+            };
+            await _messageDataAccess.AddMessage(msg);
         }
 
-        conversationQueryResult.ConversationList = conversationResultList;
+        var commandResult = new SendDmMessageCommandResult()
+        {
+            Id = msg.Id,
+            SenderId = msg.SenderId,
+            SenderName = msg.SenderName,
+            Content = msg.Content,
+            ConversationId = msg.ConversationId,
+            Timestamp = msg.Timestamp
+        };
 
-        return conversationQueryResult;
-    }
-    public Task<Conversation> GetConversationBetweenUsers(Guid userId1, Guid userId2)
-    {
-        return _messageDataAccess.GetConversationBetweenUsers(userId1, userId2);
+        return commandResult;
     }
 }

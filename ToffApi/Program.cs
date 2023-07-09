@@ -10,6 +10,7 @@ using ToffApi.Command.CommandResults;
 using ToffApi.Models;
 using ToffApi.DtoModels;
 using ToffApi.Hubs;
+using ToffApi.Query.QueryHandlers;
 using ToffApi.Services.AuthenticationService;
 using ToffApi.Services.CloudFlareR2Service;
 using ToffApi.Services.DataAccess;
@@ -51,7 +52,10 @@ builder.Services.AddSingleton<IMessageDataAccess, MessageDataAccess>(provider =>
     mongoDbName));
 builder.Services.AddSingleton<IUserDataAccess, UserDataAccess>(provider => new UserDataAccess(mongoDbSettings.ConnectionString,
     mongoDbName));
+builder.Services.AddSingleton<UserCommandHandler>();
+builder.Services.AddSingleton<UserQueryHandler>();
 builder.Services.AddSingleton<MessageCommandHandler>();
+builder.Services.AddSingleton<MessageQueryHandler>();
 builder.Services.AddSingleton<JwtSecurityTokenHandler>();
 builder.Services.AddSingleton<IMapper, Mapper>(_ => mapper);
 builder.Services.AddDistributedMemoryCache();

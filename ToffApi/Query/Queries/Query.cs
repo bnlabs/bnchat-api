@@ -2,11 +2,7 @@ namespace ToffApi.Query.Queries;
 
 public abstract class Query
 {
-    protected Query(IHttpContextAccessor callerContext)
+    protected Query()
     {
-        CallerContext = callerContext;
     }
-
-    public IHttpContextAccessor CallerContext;
-
 }

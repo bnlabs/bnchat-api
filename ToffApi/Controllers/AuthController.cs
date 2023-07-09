@@ -17,9 +17,11 @@ namespace ToffApi.Controllers
         private readonly IAccessTokenManager _accessTokenManager;
         private readonly SignInManager<User> _signInManager;
 
-        public AuthController(UserManager<User> userManager,
+        public AuthController(JwtSecurityTokenHandler tokenHandler,
+            IHttpContextAccessor httpContextAccessor,
+            UserManager<User> userManager,
             IAccessTokenManager accessTokenManager,
-            SignInManager<User> signInManager)
+            SignInManager<User> signInManager) : base(tokenHandler, httpContextAccessor)
         {
             _userManager = userManager;
             _accessTokenManager = accessTokenManager;
@@ -32,7 +34,7 @@ namespace ToffApi.Controllers
             if (!ModelState.IsValid) return Ok();
             var appUser = new User
             {
-                UserName = user.Name,
+                UserName = user.Username,
                 Email = user.Email
             };
 
@@ -67,9 +69,8 @@ namespace ToffApi.Controllers
                                     id = appUser.Id,
                                     username = appUser.UserName,
                                     email = appUser.Email,
-                                    pictureUrl = appUser.PictureUrl,
-                                    Token = token
-                                });
+                                    pictureUrl = appUser.PictureUrl
+                        });
                     }
                 }
                 ModelState.AddModelError(nameof(loginInfo.Email), "Login Failed: Invalid Email or Password");

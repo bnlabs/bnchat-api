@@ -1,9 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ToffApi.DtoModels;
-using ToffApi.Services.CloudFlareR2Service;
-using ToffApi.Services.DataAccess;
+using ToffApi.Command.CommandBuses;
+using ToffApi.Command.CommandHandlers;
+using ToffApi.Exceptions;
+using ToffApi.Query.Queries;
+using ToffApi.Query.QueryHandlers;
 
 namespace ToffApi.Controllers
 {
@@ -12,86 +14,59 @@ namespace ToffApi.Controllers
     [ApiController]
     public class UserController : Controller
     {
-        private readonly IUserDataAccess _userDataAccess;
-        private readonly IR2Service _r2Service;
-        private readonly JwtSecurityTokenHandler _tokenHandler;
-        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly UserQueryHandler _userQueryHandler;
+        private readonly UserCommandHandler _userCommandHandler;
 
-        public UserController(IUserDataAccess userDataAccess, IR2Service r2Service, JwtSecurityTokenHandler tokenHandler, IHttpContextAccessor httpContextAccessor)
+        public UserController(JwtSecurityTokenHandler tokenHandler,
+            IHttpContextAccessor httpContextAccessor,
+            UserQueryHandler userQueryHandler, 
+            UserCommandHandler userCommandHandler)
+            : base(tokenHandler, httpContextAccessor)
         {
-            _userDataAccess = userDataAccess;
-            _r2Service = r2Service;
-            _tokenHandler = tokenHandler;
-            _httpContextAccessor = httpContextAccessor;
+            _userQueryHandler = userQueryHandler;
+            _userCommandHandler = userCommandHandler;
         }
 
         [HttpGet("getUserById")]
         public async Task<IActionResult> GetUserById(Guid userId)
         {
-            var users = await _userDataAccess.GetUserByIdAsync(userId);
-            var resultUser = new UserDto()
+            try
             {
-                Name = users[0].UserName,
-                Id = users[0].Id,
-                PictureUrl = users[0].PictureUrl
-            };
-            return Ok(resultUser);
+                var query = new GetUserByIdQuery() { UserId = userId };
+                var queryResult = await _userQueryHandler.HandleAsync(query);
+                return Ok(queryResult.User);
+            }
+            catch(UserNotFoundException)
+            {
+                return NotFound("user not found");
+            }
         }
 
         [HttpPost("getUsers")]
         public async Task<IActionResult> GetUsersById([FromBody]List<Guid> listOfUserId)
         {
-            var result = new List<UserDto>();
-            foreach (var id in listOfUserId.Distinct())
-            {
-                var userList = await _userDataAccess.GetUserByIdAsync(id);
-                var user = userList[0];
-                var userDto = new UserDto()
-                {
-                    Id = user.Id,
-                    Name = user.UserName,
-                    PictureUrl = user.PictureUrl
-                };
-                result.Add(userDto);
-            }
-            
-            return Ok(result);
+            var query = new GetUsersByIdsQuery() { ListOfUserIds = listOfUserId };
+            var queryResult = await _userQueryHandler.HandleAsync(query);
+            return Ok(queryResult.ListOfUsers);
         }
 
         [HttpGet("SearchUsername")]
         public async Task<IActionResult> SearchUser(string searchInput)
         {
-            var users = await _userDataAccess.SearchUser(searchInput);
-            var result = new List<UserDto>();
-            
-            foreach (var user in users)
-            {
-                var userDto = new UserDto()
-                {
-                    Id = user.Id,
-                    Name = user.UserName,
-                    PictureUrl = user.PictureUrl
-                };
-                
-                result.Add(userDto);
-            }
-
-            return Ok(result);
+            var query = new SearchUserByUsernameQuery() { searchQuery = searchInput };
+            var queryResult = await _userQueryHandler.HandleAsync(query);
+           return Ok(queryResult.ListOfUsers);
         }
         
         [HttpPost("uploadPfp")]
         public async Task<IActionResult> UploadPfp(IFormFile file)
         {
-            if (file == null || file.Length <= 0) return BadRequest("No file was selected for upload");
+            if (file is not { Length: > 0 }) return BadRequest("No file was selected for upload");
+            var userId = new Guid(ExtractUserId());
+            var command = new UpdatePfpCommand() { UserId = userId, File = file };
+            var commandResult = await _userCommandHandler.HandleAsync(command);
             
-            var tokenFromRequest = _httpContextAccessor?.HttpContext?.Request.Cookies["X-Access-Token"];
-            var userId = _tokenHandler.ReadJwtToken(tokenFromRequest).Claims.First(claim => claim.Type == "userId").Value;
-
-            var pfpUrl = await _r2Service.UploadObject(file);
-
-            var url = await _userDataAccess.UpdateUserPfp(new Guid(userId), pfpUrl);
-
-            return Ok(new { url });
+            return Ok(commandResult.Url);
 
         }
     }
