@@ -24,7 +24,7 @@ public class UserQueryHandler : QueryHandler
         }
         var resultUser = new UserDto()
         {
-            Name = users[0].UserName,
+            Username = users[0].UserName,
             Id = users[0].Id,
             PictureUrl = users[0].PictureUrl
         };
@@ -43,7 +43,7 @@ public class UserQueryHandler : QueryHandler
             var userDto = new UserDto()
             {
                 Id = user.Id,
-                Name = user.UserName,
+                Username = user.UserName,
                 PictureUrl = user.PictureUrl
             };
             result.Add(userDto);
@@ -59,7 +59,7 @@ public class UserQueryHandler : QueryHandler
         var result = users.Select(user => new UserDto
         {
             Id = user.Id,
-            Name = user.UserName,
+            Username = user.UserName,
             PictureUrl = user.PictureUrl
         }).ToList();
 

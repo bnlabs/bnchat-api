@@ -34,7 +34,7 @@ namespace ToffApi.Controllers
             if (!ModelState.IsValid) return Ok();
             var appUser = new User
             {
-                UserName = user.Name,
+                UserName = user.Username,
                 Email = user.Email
             };
 

@@ -31,4 +31,13 @@
     <Folder Include="Services\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="publish\web.config" />
+    <_ContentIncludedByDefault Remove="publish\appsettings.Development.json" />
+    <_ContentIncludedByDefault Remove="publish\appsettings.json" />
+    <_ContentIncludedByDefault Remove="publish\appsettings_example.json" />
+    <_ContentIncludedByDefault Remove="publish\ToffApi.deps.json" />
+    <_ContentIncludedByDefault Remove="publish\ToffApi.runtimeconfig.json" />
+  </ItemGroup>
+
 </Project>
