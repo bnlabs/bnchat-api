@@ -55,7 +55,7 @@ namespace ToffApi.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginDto loginInfo)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
                 var appUser = await _userManager.FindByEmailAsync(loginInfo.Email);
                 if (appUser != null)
