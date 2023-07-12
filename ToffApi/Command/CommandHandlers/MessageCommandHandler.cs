@@ -24,11 +24,13 @@ public class MessageCommandHandler : CommandHandler
     public async Task<SendDmMessageCommandResult> HandleAsync(SendDmMessageCommand command)
     {
         // check if conversation already exist, if it does, then get conversation
+        var commandResult = new SendDmMessageCommandResult();
         var getConversationQuery = new GetConversationBetweenUsersQuery(command.SenderId, command.ReceiverId);
         var msg = new Message();
         try
         {
             var conversation = await _messageQueryHandler.HandleAsync(getConversationQuery);
+            commandResult.NewConversation = false;
             msg = new Message()
             {
                 ConversationId = conversation.ConversationId,
@@ -41,6 +43,7 @@ public class MessageCommandHandler : CommandHandler
         }
         catch (ConversationNotFoundException)
         {
+            commandResult.NewConversation = true;
             var memberList = new List<Guid>
             {
                 command.SenderId,
@@ -59,15 +62,17 @@ public class MessageCommandHandler : CommandHandler
             await _messageDataAccess.AddMessage(msg);
         }
 
-        var commandResult = new SendDmMessageCommandResult()
+        commandResult.Id = msg.Id;
+        commandResult.SenderId = msg.SenderId;
+        commandResult.SenderName = msg.SenderName;
+        commandResult.Content = msg.Content;
+        commandResult.ConversationId = msg.ConversationId;
+        commandResult.Timestamp = msg.Timestamp;
+
+        if (!string.IsNullOrEmpty(command.ReceiverId.ToString()))
         {
-            Id = msg.Id,
-            SenderId = msg.SenderId,
-            SenderName = msg.SenderName,
-            Content = msg.Content,
-            ConversationId = msg.ConversationId,
-            Timestamp = msg.Timestamp
-        };
+            commandResult.ReceiverId = command.ReceiverId;
+        }
 
         return commandResult;
     }
