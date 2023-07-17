@@ -4,6 +4,7 @@ using ToffApi.Query.Queries;
 using ToffApi.Query.QueryResults;
 using ToffApi.Services.DataAccess;
 using Exception = System.Exception;
+using ToffApi.Services.EmbedGenerator;
 
 namespace ToffApi.Query.QueryHandlers;
 
@@ -49,6 +50,13 @@ public class MessageQueryHandler : QueryHandler
             );
             c.MemberMap = memberMap;
             c.Messages = await _messageDataAccess.GetMessagesFromConversation(query.UserId, c.ConversationId);
+            
+            foreach (var message in c.Messages.OrderByDescending(m => m.Timestamp).ToList())
+            {
+                var embeds = EmbedGenerator.GenerateEmbed(message.Content);
+                message.Embeds = embeds;
+            }
+            
             c.Messages = c.Messages.OrderByDescending(m => m.Timestamp).ToList();
         }
         

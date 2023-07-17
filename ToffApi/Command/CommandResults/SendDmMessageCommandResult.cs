@@ -1,3 +1,5 @@
+using ToffApi.Models;
+
 namespace ToffApi.Command.CommandResults;
 
 public class SendDmMessageCommandResult
@@ -9,5 +11,6 @@ public class SendDmMessageCommandResult
     public Guid ReceiverId { get; set; }
     public string Content { get; set; }
     public DateTime Timestamp { get; set; }
+    public List<Embed> Embeds { get; set; }
     public bool NewConversation { get; set; }
 }

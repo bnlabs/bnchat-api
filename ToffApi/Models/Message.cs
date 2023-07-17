@@ -16,9 +16,8 @@ public class Message
     [BsonIgnore]
     public string SenderName { get; set; }
     public Guid SenderId { get; set; }
-
     public string Content { get; set; }
-
     public DateTime Timestamp { get; set; }
+    public List<Embed> Embeds { get; set; }
 
 }

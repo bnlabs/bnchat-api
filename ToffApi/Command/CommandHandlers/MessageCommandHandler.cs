@@ -4,8 +4,8 @@ using ToffApi.Exceptions;
 using ToffApi.Models;
 using ToffApi.Query.Queries;
 using ToffApi.Query.QueryHandlers;
-using ToffApi.Query.QueryResults;
 using ToffApi.Services.DataAccess;
+using ToffApi.Services.EmbedGenerator;
 
 namespace ToffApi.Command.CommandHandlers;
 
@@ -68,7 +68,8 @@ public class MessageCommandHandler : CommandHandler
         commandResult.Content = msg.Content;
         commandResult.ConversationId = msg.ConversationId;
         commandResult.Timestamp = msg.Timestamp;
-
+        commandResult.Embeds = EmbedGenerator.GenerateEmbed(command.Content);
+        
         if (!string.IsNullOrEmpty(command.ReceiverId.ToString()))
         {
             commandResult.ReceiverId = command.ReceiverId;
