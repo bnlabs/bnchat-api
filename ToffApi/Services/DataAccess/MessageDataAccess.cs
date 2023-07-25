@@ -27,10 +27,16 @@ public class MessageDataAccess : IMessageDataAccess
 
     public async Task<List<Message>> GetMessagesFromConversation(Guid userId, Guid conversationId)
     {
+        var limit = 50;
         var messageCollection = ConnectToMongo<Message>(MessageCollection);
-        var results = await messageCollection.FindAsync(msg => 
-            msg.ConversationId == conversationId);
-        return results.ToList();
+        var sort = Builders<Message>.Sort.Descending(m => m.Timestamp);
+        var filter = Builders<Message>.Filter.Eq(m => m.ConversationId, conversationId);
+        var messages = await messageCollection
+            .Find(filter)
+            .Sort(sort)
+            .Limit(limit)
+            .ToListAsync();
+        return messages;
     }
 
     public async Task AddMessage(Message msg)
