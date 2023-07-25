@@ -55,14 +55,12 @@ public class MessageHub : ToffHub
         var commandResult = await _messageCommandHandler.HandleAsync(command);
         
         var groupName = $"conversation-{commandResult.ConversationId}";
-        
+        _connectedUsers.TryGetValue(commandResult.SenderId.ToString(), out var connectionId2);
+        await Groups.AddToGroupAsync(connectionId2, groupName);
+
         if (commandResult.NewConversation && _connectedUsers.TryGetValue(commandResult.ReceiverId.ToString(), out var connectionId))
         {
             await Groups.AddToGroupAsync(connectionId, groupName);
-            
-            _connectedUsers.TryGetValue(commandResult.SenderId.ToString(), out var connectionId2);
-            
-            await Groups.AddToGroupAsync(connectionId2, groupName);
         }
 
         await Clients.Group(groupName).SendAsync("ReceiveMessage", commandResult);

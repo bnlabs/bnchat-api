@@ -25,6 +25,7 @@ var mongoDbName = mongoDbSettings.Name;
 // read from appsettings.json (CloudFlare R2)
 var accessKeyR2 = builder.Configuration["R2:AccessKey"];
 var secretKeyR2 = builder.Configuration["R2:SecretKey"];
+var r2BucketUrl = builder.Configuration["R2:bucketUrl"];
 var r2Url = builder.Configuration["R2:Url"];
 
 // Mapper config
@@ -47,7 +48,7 @@ builder.Services
     .AddMongoDbStores<User, ApplicationRole, Guid>(mongoDbSettings.ConnectionString, mongoDbSettings.Name);
 builder.Services.AddSingleton<IAccessTokenManager, AccessTokenManager>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddSingleton<IR2Service, R2Service>(provider => new R2Service(accessKeyR2, secretKeyR2, r2Url));
+builder.Services.AddSingleton<IR2Service, R2Service>(provider => new R2Service(accessKeyR2, secretKeyR2, r2Url, r2BucketUrl));
 builder.Services.AddSingleton<IMessageDataAccess, MessageDataAccess>(provider => new MessageDataAccess(mongoDbSettings.ConnectionString,
     mongoDbName));
 builder.Services.AddSingleton<IUserDataAccess, UserDataAccess>(provider => new UserDataAccess(mongoDbSettings.ConnectionString,
