@@ -19,6 +19,7 @@ public class MessageCommandHandler : CommandHandler
     {
         _messageDataAccess = messageDataAccess;
         _messageQueryHandler = messageQueryHandler;
+        _messageQueryHandler = messageQueryHandler;
     }
 
     public async Task<SendDmMessageCommandResult> HandleAsync(SendDmMessageCommand command)
